@@ -1,0 +1,14 @@
+# Секреты
+.env
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+
+# macOS
+.DS_Store
+
+# IDE
+.idea/
+.vscode/

@@ -1,0 +1,1919 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ALISA SCHOOL</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --accent-1: #ff5fa2; --accent-2: #8b5cf6; --accent-3: #22d3ee;
+    --bg-1: #0b0b1a; --bg-2: #14142e;
+    --text: #eef0fa; --muted: rgba(238,240,250,0.62);
+    --card: rgba(22,22,50,0.55); --border: rgba(139,92,246,0.22);
+    --radius: 20px; --font: 'Segoe UI', system-ui, sans-serif;
+  }
+  body.light { --bg-1:#f4f4fb; --bg-2:#e9e9f7; --text:#1a1a2e; --muted:rgba(26,26,46,0.65); --card:rgba(255,255,255,0.75); --border:rgba(139,92,246,0.25); }
+  body.theme-neon { --accent-1:#00ff88; --accent-2:#00d4ff; --accent-3:#ff00aa; }
+  body.theme-sun { --accent-1:#ff6b35; --accent-2:#f7931e; --accent-3:#ffd23f; }
+  body.theme-ocean { --accent-1:#06ffa5; --accent-2:#00b4d8; --accent-3:#0077b6; }
+
+  html { scroll-behavior: smooth; }
+  body { min-height:100vh; background:radial-gradient(circle at 50% 0%, var(--bg-2) 0%, var(--bg-1) 100%); font-family:var(--font); color:var(--text); overflow-x:hidden; transition:background .5s, color .5s; position:relative; font-size:var(--base-font, 16px); }
+
+  .grid-bg { position:fixed; inset:0; background-image: linear-gradient(rgba(139,92,246,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(139,92,246,0.05) 1px, transparent 1px); background-size:64px 64px; animation:gridMove 30s linear infinite; z-index:0; pointer-events:none; }
+  @keyframes gridMove { to { background-position: 64px 64px; } }
+
+  .orb { position:fixed; border-radius:50%; filter:blur(110px); opacity:.42; z-index:1; pointer-events:none; }
+  .orb-1 { width:420px; height:420px; background:var(--accent-1); top:-140px; left:-140px; animation:drift 22s ease-in-out infinite; }
+  .orb-2 { width:520px; height:520px; background:var(--accent-2); bottom:-200px; right:-200px; animation:drift 28s ease-in-out infinite reverse; }
+  .orb-3 { width:360px; height:360px; background:var(--accent-3); top:42%; left:58%; animation:drift 32s ease-in-out infinite; }
+  @keyframes drift { 0%,100% { transform:translate(0,0) scale(1); } 33% { transform:translate(90px,-70px) scale(1.15); } 66% { transform:translate(-70px,90px) scale(.9); } }
+
+  .particle { position:fixed; border-radius:50%; pointer-events:none; z-index:2; animation:rise linear infinite; }
+  @keyframes rise { from { transform:translateY(105vh) scale(.4); opacity:0; } 10% { opacity:.8; } 90% { opacity:.8; } to { transform:translateY(-10vh) scale(1.3); opacity:0; } }
+
+  header { position:sticky; top:0; z-index:100; backdrop-filter:blur(18px); background:color-mix(in srgb, var(--bg-1) 70%, transparent); border-bottom:1px solid var(--border); padding:12px 20px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; }
+  .logo { font-size:1.25rem; font-weight:800; background:linear-gradient(90deg,var(--accent-1),var(--accent-2),var(--accent-3)); background-size:200% 200%; animation:gradientShift 5s ease infinite; -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; letter-spacing:1px; }
+  @keyframes gradientShift { 0%,100% { background-position:0% 50%; } 50% { background-position:100% 50%; } }
+
+  nav { display:flex; gap:4px; flex-wrap:wrap; align-items:center; }
+  nav button { background:transparent; border:1px solid transparent; color:var(--muted); font-size:.85rem; padding:7px 12px; border-radius:999px; cursor:pointer; transition:all .3s; font-family:inherit; }
+  nav button:hover { color:var(--text); background:rgba(139,92,246,.15); }
+  nav button.active { color:var(--text); background:rgba(139,92,246,.3); border-color:rgba(139,92,246,.5); box-shadow:0 0 20px rgba(139,92,246,.4); }
+
+  .header-actions { display:flex; gap:6px; align-items:center; }
+  .icon-btn { width:36px; height:36px; border-radius:50%; background:rgba(139,92,246,.15); border:1px solid var(--border); color:var(--text); cursor:pointer; font-size:1rem; transition:all .3s; display:flex; align-items:center; justify-content:center; }
+  .icon-btn:hover { transform:scale(1.1); background:rgba(139,92,246,.3); }
+  .icon-btn.off { opacity:.4; }
+
+  main { position:relative; z-index:5; max-width:1200px; margin:0 auto; padding:40px 20px 80px; }
+  .page { display:none; }
+  .page.active { display:block; animation:fadeUp .5s ease; }
+  @keyframes fadeUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+
+  .hero { text-align:center; margin-bottom:40px; }
+  .hero .tag { display:inline-block; font-size:.72rem; letter-spacing:3px; text-transform:uppercase; color:var(--accent-3); border:1px solid color-mix(in srgb, var(--accent-3) 40%, transparent); padding:5px 14px; border-radius:999px; margin-bottom:14px; }
+  .hero h1 { font-size:clamp(1.6rem, 4vw, 2.6rem); font-weight:800; line-height:1.15; margin-bottom:14px; background:linear-gradient(120deg,var(--accent-1),var(--accent-2),var(--accent-3)); background-size:200% 200%; -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; animation:gradientShift 6s ease infinite; }
+  .hero p { color:var(--muted); max-width:640px; margin:0 auto; font-size:.95rem; line-height:1.7; }
+
+  .grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(240px, 1fr)); gap:18px; }
+  .card { background:var(--card); border:1px solid var(--border); border-radius:var(--radius); padding:22px 20px; backdrop-filter:blur(16px); transition:transform .35s, box-shadow .35s, border-color .35s; animation:fadeUp .6s ease both; }
+  .card:hover { transform:translateY(-6px); border-color:color-mix(in srgb, var(--accent-2) 70%, transparent); box-shadow:0 20px 50px color-mix(in srgb, var(--accent-2) 30%, transparent); }
+  .card .icon { font-size:1.8rem; margin-bottom:10px; display:inline-block; }
+  .card h3 { font-size:1.1rem; margin-bottom:8px; }
+  .card p { color:var(--muted); font-size:.88rem; line-height:1.5; margin-bottom:14px; }
+
+  .btn { display:inline-block; padding:9px 20px; border-radius:999px; font-size:.85rem; font-weight:600; color:#fff; background:linear-gradient(120deg,var(--accent-1),var(--accent-2)); background-size:200% 200%; border:none; cursor:pointer; transition:transform .25s, box-shadow .25s, background-position .5s; font-family:inherit; }
+  .btn:hover { transform:scale(1.05); box-shadow:0 0 25px color-mix(in srgb, var(--accent-2) 70%, transparent); background-position:100% 50%; }
+  .btn:active { transform:scale(.97); }
+
+  .btn-sm { padding:6px 12px; font-size:.78rem; border-radius:8px; background:rgba(139,92,246,.18); border:1px solid rgba(139,92,246,.4); color:var(--text); cursor:pointer; transition:all .25s; font-family:inherit; }
+  .btn-sm:hover { background:rgba(139,92,246,.4); }
+  .btn-sm.active { background:linear-gradient(120deg,var(--accent-1),var(--accent-2)); border-color:transparent; }
+
+  .grades { display:flex; flex-wrap:wrap; gap:8px; justify-content:center; margin-bottom:24px; }
+  .grade-btn { padding:10px 18px; border-radius:12px; background:var(--card); border:1px solid var(--border); color:var(--text); font-size:.9rem; cursor:pointer; transition:all .3s; font-family:inherit; }
+  .grade-btn:hover { border-color:var(--accent-3); transform:translateY(-2px); }
+  .grade-btn.active { background:linear-gradient(120deg,var(--accent-1),var(--accent-2)); border-color:transparent; box-shadow:0 0 20px color-mix(in srgb, var(--accent-2) 60%, transparent); transform:translateY(-2px) scale(1.03); }
+
+  .subjects-row { display:grid; grid-template-columns:repeat(auto-fit, minmax(170px, 1fr)); gap:12px; margin-bottom:24px; }
+  .subject-card { padding:16px; background:var(--card); border:1px solid var(--border); border-radius:14px; cursor:pointer; transition:all .3s; text-align:center; }
+  .subject-card:hover { transform:translateY(-4px) scale(1.02); border-color:var(--accent-3); }
+  .subject-card.active { background:linear-gradient(135deg, color-mix(in srgb, var(--accent-1) 15%, transparent), color-mix(in srgb, var(--accent-2) 15%, transparent)); border-color:var(--accent-1); }
+  .subject-card .s-icon { font-size:1.7rem; margin-bottom:6px; display:block; }
+  .subject-card h4 { font-size:.92rem; margin-bottom:4px; }
+  .subject-card span { font-size:.72rem; color:var(--muted); }
+  .subject-card .mini-progress { height:4px; background:rgba(139,92,246,.15); border-radius:999px; margin-top:8px; overflow:hidden; }
+  .subject-card .mini-progress-fill { height:100%; width:0%; background:linear-gradient(90deg,var(--accent-3),var(--accent-1)); transition:width .5s; }
+
+  .search-box { max-width:520px; margin:0 auto 24px; position:relative; }
+  .search-box input { width:100%; padding:12px 42px 12px 16px; background:var(--card); border:1px solid var(--border); border-radius:12px; color:var(--text); font-size:.95rem; outline:none; font-family:inherit; }
+  .search-box input:focus { border-color:var(--accent-3); box-shadow:0 0 20px color-mix(in srgb, var(--accent-3) 40%, transparent); }
+  .search-box::after { content:'🔍'; position:absolute; right:14px; top:50%; transform:translateY(-50%); pointer-events:none; opacity:.6; }
+
+  .topics-wrap { display:grid; grid-template-columns:repeat(auto-fit, minmax(260px, 1fr)); gap:14px; }
+  .topic { background:var(--card); border:1px solid var(--border); border-radius:14px; padding:18px; transition:all .3s; position:relative; }
+  .topic.learned { border-color:rgba(52,211,153,.5); }
+  .topic.learned::after { content:'✓'; position:absolute; top:10px; right:12px; color:#34d399; font-weight:700; font-size:1rem; }
+  .topic:hover { border-color:color-mix(in srgb, var(--accent-2) 60%, transparent); }
+  .topic h4 { font-size:.98rem; margin-bottom:10px; color:var(--accent-3); display:flex; align-items:center; gap:6px; }
+  .topic h4::before { content:'◆'; color:var(--accent-2); font-size:.65rem; }
+  .topic-actions { display:flex; gap:6px; flex-wrap:wrap; }
+
+  .explain-btn, .learn-btn { padding:7px 14px; font-size:.78rem; border-radius:8px; cursor:pointer; transition:all .25s; font-family:inherit; }
+  .explain-btn { background:rgba(139,92,246,.15); border:1px solid rgba(139,92,246,.4); color:var(--text); }
+  .explain-btn:hover { background:rgba(139,92,246,.4); }
+  .learn-btn { background:rgba(52,211,153,.1); border:1px solid rgba(52,211,153,.4); color:#34d399; }
+  .learn-btn:hover { background:rgba(52,211,153,.3); }
+
+  .explain-text { margin-top:12px; padding:14px 16px; background:rgba(34,211,238,.07); border-left:3px solid var(--accent-3); border-radius:8px; font-size:.87rem; line-height:1.65; color:var(--text); display:none; }
+  .explain-text.open { display:block; animation:fadeUp .3s ease; }
+  .explain-text .def { display:block; margin-bottom:6px; }
+  .explain-text .rule { display:block; margin:6px 0; padding:6px 10px; background:rgba(139,92,246,.15); border-radius:6px; font-family:'Courier New', monospace; font-size:.85rem; }
+  .explain-text .example { display:block; margin-top:6px; color:#34d399; font-style:italic; }
+  .explain-text .note { display:block; margin-top:6px; padding:5px 9px; background:rgba(251,191,36,.1); border-left:2px solid #fbbf24; border-radius:5px; font-size:.8rem; color:#fbbf24; }
+
+  .material-text { line-height:1.8; font-size:.9rem; background:rgba(34,211,238,.1) !important; }
+  .material-text h5 { color:var(--accent-3); margin:14px 0 8px; font-size:.95rem; }
+  .material-text p { margin-bottom:10px; }
+  .material-text ul, .material-text ol { margin:8px 0 12px 20px; }
+  .material-text li { margin-bottom:6px; line-height:1.6; }
+  .material-text code { background:rgba(139,92,246,.15); padding:2px 8px; border-radius:5px; font-family:'Courier New', monospace; color:var(--accent-3); font-size:.88em; }
+  .material-text .formula { display:block; background:rgba(139,92,246,.12); border-left:3px solid var(--accent-2); padding:10px 14px; border-radius:6px; margin:10px 0; font-family:'Courier New', monospace; color:var(--accent-3); font-size:.95em; text-align:center; }
+  .material-text .tip { background:rgba(251,191,36,.1); border-left:3px solid #fbbf24; padding:10px 14px; border-radius:6px; margin:10px 0; color:#fbbf24; font-size:.88em; }
+
+  .test-wrap { max-width:680px; margin:0 auto; }
+  .test-header { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:16px; }
+  .test-progress { height:6px; background:rgba(139,92,246,.15); border-radius:999px; overflow:hidden; flex:1; min-width:140px; }
+  .test-progress-fill { height:100%; width:0%; background:linear-gradient(90deg,var(--accent-1),var(--accent-3)); transition:width .5s ease; }
+  .test-counter { font-size:.85rem; color:var(--muted); }
+  .test-question { font-size:1.2rem; font-weight:700; margin:20px 0; line-height:1.4; }
+  .test-options { display:flex; flex-direction:column; gap:8px; }
+  .test-opt { padding:14px 18px; text-align:left; background:var(--card); border:1px solid var(--border); border-radius:12px; color:var(--text); font-size:.95rem; cursor:pointer; transition:all .25s; font-family:inherit; }
+  .test-opt:hover:not(:disabled) { border-color:var(--accent-3); background:color-mix(in srgb, var(--accent-3) 10%, transparent); transform:translateX(4px); }
+  .test-opt:disabled { cursor:default; }
+  .test-opt.correct { background:rgba(52,211,153,.2); border-color:#34d399; }
+  .test-opt.wrong { background:rgba(255,95,162,.15); border-color:var(--accent-1); }
+  .test-result { text-align:center; padding:30px 20px; }
+  .test-result .score { font-size:3.5rem; font-weight:800; background:linear-gradient(120deg,var(--accent-1),var(--accent-3)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+  .test-result .msg { font-size:1.1rem; margin:14px 0 20px; }
+
+  .task-wrap { max-width:680px; margin:0 auto; }
+  .task-card { background:var(--card); border:1px solid var(--border); border-radius:16px; padding:24px; animation:fadeUp .4s ease; }
+  .task-question { font-size:1.15rem; font-weight:600; line-height:1.5; margin-bottom:18px; }
+  .task-input-row { display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-bottom:14px; }
+  .task-input { flex:1; min-width:120px; padding:12px 14px; background:color-mix(in srgb, var(--bg-1) 70%, transparent); border:1px solid var(--border); border-radius:10px; color:var(--text); font-size:1rem; outline:none; font-family:inherit; }
+  .task-input:focus { border-color:var(--accent-3); }
+  .task-actions { display:flex; gap:8px; flex-wrap:wrap; }
+  .task-feedback { margin-top:14px; padding:14px 16px; border-radius:10px; font-size:.95rem; line-height:1.6; display:none; }
+  .task-feedback.show { display:block; animation:fadeUp .3s ease; }
+  .task-feedback.ok { background:rgba(52,211,153,.12); border-left:3px solid #34d399; color:#34d399; }
+  .task-feedback.no { background:rgba(255,95,162,.12); border-left:3px solid var(--accent-1); color:var(--accent-1); }
+  .task-solution { margin-top:14px; padding:16px; background:rgba(34,211,238,.08); border-left:3px solid var(--accent-3); border-radius:10px; font-size:.9rem; line-height:1.7; display:none; }
+  .task-solution.show { display:block; animation:fadeUp .3s ease; }
+  .task-solution h5 { color:var(--accent-3); margin:10px 0 6px; font-size:.92rem; }
+  .task-solution .formula { display:block; background:rgba(139,92,246,.12); border-left:3px solid var(--accent-2); padding:8px 12px; border-radius:6px; margin:8px 0; font-family:'Courier New', monospace; color:var(--accent-3); font-size:.92em; text-align:center; }
+  .task-counter { font-size:.85rem; color:var(--muted); text-align:center; margin-bottom:14px; }
+
+  .calc-tabs { display:flex; flex-wrap:wrap; gap:6px; justify-content:center; margin-bottom:20px; }
+  .calc-tab { padding:8px 16px; border-radius:10px; background:var(--card); border:1px solid var(--border); color:var(--text); font-size:.85rem; cursor:pointer; font-family:inherit; transition:all .3s; }
+  .calc-tab:hover { border-color:var(--accent-3); }
+  .calc-tab.active { background:linear-gradient(120deg,var(--accent-1),var(--accent-2)); border-color:transparent; }
+  .calc-panel { display:none; max-width:480px; margin:0 auto; }
+  .calc-panel.active { display:block; }
+  .calc { background:var(--card); border:1px solid var(--border); border-radius:var(--radius); padding:20px; }
+  .calc-display { background:color-mix(in srgb, var(--bg-1) 70%, transparent); border:1px solid var(--border); border-radius:12px; padding:16px; text-align:right; font-size:1.6rem; font-weight:600; margin-bottom:14px; min-height:60px; overflow:hidden; word-break:break-all; color:var(--accent-3); }
+  .calc-history { font-size:.8rem; color:var(--muted); text-align:right; min-height:16px; margin-bottom:6px; }
+  .calc-grid { display:grid; grid-template-columns:repeat(4, 1fr); gap:8px; }
+  .calc-btn { padding:16px; font-size:1.05rem; font-weight:600; background:rgba(139,92,246,.1); border:1px solid rgba(139,92,246,.25); border-radius:10px; color:var(--text); cursor:pointer; font-family:inherit; transition:all .15s; }
+  .calc-btn:hover { background:rgba(139,92,246,.35); }
+  .calc-btn:active { transform:scale(.94); }
+  .calc-btn.op { color:var(--accent-3); }
+  .calc-btn.eq { background:linear-gradient(120deg,var(--accent-1),var(--accent-2)); color:#fff; grid-column:span 2; }
+  .calc-btn.clear { color:var(--accent-1); }
+  .calc-field { width:100%; padding:12px 14px; background:color-mix(in srgb, var(--bg-1) 70%, transparent); border:1px solid var(--border); border-radius:10px; color:var(--text); font-size:.95rem; outline:none; font-family:inherit; margin-bottom:10px; }
+  .calc-field:focus { border-color:var(--accent-3); }
+  .calc-output { background:rgba(34,211,238,.08); border-left:3px solid var(--accent-3); padding:12px 16px; border-radius:8px; font-size:1rem; color:var(--accent-3); margin-top:12px; line-height:1.6; min-height:20px; font-family:'Courier New', monospace; white-space:pre-wrap; word-break:break-all; }
+  .frac-row { display:flex; gap:8px; align-items:center; margin-bottom:10px; }
+  .frac-row input { flex:1; margin-bottom:0; text-align:center; }
+  .frac-row span { color:var(--muted); font-size:1.1rem; }
+
+  .tool-panel { display:none; }
+  .tool-panel.active { display:block; }
+
+  .mult-wrap { max-width:600px; margin:0 auto; text-align:center; }
+  .mult-levels { display:flex; gap:6px; justify-content:center; flex-wrap:wrap; margin-bottom:16px; }
+  .mult-q { font-size:2.2rem; font-weight:800; margin:20px 0; background:linear-gradient(120deg,var(--accent-1),var(--accent-3)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+  .mult-input { width:120px; padding:12px; font-size:1.3rem; text-align:center; background:color-mix(in srgb, var(--bg-1) 70%, transparent); border:1px solid var(--border); border-radius:10px; color:var(--text); outline:none; font-family:inherit; }
+  .mult-status { margin-top:12px; font-size:1rem; min-height:22px; font-weight:600; }
+  .mult-status.ok { color:#34d399; }
+  .mult-status.no { color:var(--accent-1); }
+
+  .num-box, .conv-box, .word-box { max-width:560px; margin:0 auto; }
+  .num-box input, .conv-box input, .conv-box select, .word-box textarea { width:100%; padding:12px 14px; background:color-mix(in srgb, var(--bg-1) 70%, transparent); border:1px solid var(--border); border-radius:10px; color:var(--text); font-size:.95rem; outline:none; margin-bottom:10px; font-family:inherit; }
+  .word-box textarea { min-height:180px; resize:vertical; line-height:1.6; }
+  .num-out, .conv-result { background:rgba(34,211,238,.08); border-left:3px solid var(--accent-3); padding:12px 16px; border-radius:8px; font-size:1rem; color:var(--accent-3); line-height:1.7; word-break:break-all; }
+  .conv-result { margin-top:10px; font-weight:600; }
+  .word-stats { margin-top:12px; display:flex; gap:16px; flex-wrap:wrap; justify-content:center; font-size:.88rem; color:var(--muted); }
+  .word-stats b { color:var(--accent-3); font-size:1rem; }
+
+  .fact-box { max-width:700px; margin:0 auto; background:var(--card); border:1px solid var(--border); border-radius:var(--radius); padding:26px; text-align:center; }
+  .fact-text { font-size:1.05rem; line-height:1.6; margin:16px 0; min-height:70px; }
+  .fact-subjects { display:flex; gap:6px; justify-content:center; flex-wrap:wrap; margin-bottom:16px; }
+
+  .cheat-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(260px, 1fr)); gap:14px; }
+  .cheat { background:var(--card); border:1px solid var(--border); border-radius:14px; padding:18px; }
+  .cheat h4 { color:var(--accent-3); margin-bottom:10px; font-size:.95rem; }
+  .cheat ul { list-style:none; }
+  .cheat li { padding:6px 0; border-bottom:1px solid rgba(139,92,246,.1); font-size:.87rem; color:var(--muted); font-family:'Courier New', monospace; }
+  .cheat li:last-child { border-bottom:none; }
+  .cheat li b { color:#fbbf24; font-family:var(--font); }
+
+  .timer-box { max-width:360px; margin:0 auto; text-align:center; }
+  .timer-display { font-size:3.5rem; font-weight:800; margin:16px 0; background:linear-gradient(120deg,var(--accent-1),var(--accent-3)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+  .timer-modes { display:flex; gap:6px; justify-content:center; margin-bottom:16px; flex-wrap:wrap; }
+
+  .notes-box { max-width:640px; margin:0 auto; }
+  .notes-box textarea { width:100%; min-height:260px; padding:16px; background:color-mix(in srgb, var(--bg-1) 70%, transparent); border:1px solid var(--border); border-radius:12px; color:var(--text); font-size:.95rem; line-height:1.6; resize:vertical; outline:none; font-family:inherit; }
+  .notes-status { text-align:right; font-size:.78rem; color:#34d399; margin-top:6px; min-height:16px; }
+
+  .stats { display:grid; grid-template-columns:repeat(auto-fit, minmax(140px, 1fr)); gap:12px; margin-bottom:24px; }
+  .stat { background:var(--card); border:1px solid var(--border); border-radius:14px; padding:16px; text-align:center; }
+  .stat .num { font-size:1.6rem; font-weight:800; background:linear-gradient(120deg,var(--accent-1),var(--accent-3)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+  .stat .label { font-size:.78rem; color:var(--muted); margin-top:4px; }
+
+  .customize-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(260px, 1fr)); gap:16px; }
+  .custom-block { background:var(--card); border:1px solid var(--border); border-radius:14px; padding:20px; }
+  .custom-block h4 { color:var(--accent-3); margin-bottom:12px; font-size:1rem; }
+  .custom-block label { display:block; font-size:.85rem; color:var(--muted); margin:10px 0 6px; }
+  .custom-block input[type="range"] { width:100%; }
+  .theme-swatches { display:flex; gap:8px; flex-wrap:wrap; }
+  .swatch { width:40px; height:40px; border-radius:50%; cursor:pointer; border:2px solid transparent; transition:transform .2s; }
+  .swatch:hover { transform:scale(1.15); }
+  .swatch.active { border-color:#fff; box-shadow:0 0 15px rgba(255,255,255,.5); }
+  .swatch-default { background:linear-gradient(135deg, #ff5fa2, #8b5cf6, #22d3ee); }
+  .swatch-neon { background:linear-gradient(135deg, #00ff88, #00d4ff, #ff00aa); }
+  .swatch-sun { background:linear-gradient(135deg, #ff6b35, #f7931e, #ffd23f); }
+  .swatch-ocean { background:linear-gradient(135deg, #06ffa5, #00b4d8, #0077b6); }
+
+  footer { position:relative; z-index:5; text-align:center; padding:30px 20px; color:var(--muted); font-size:.82rem; border-top:1px solid var(--border); }
+
+  .ai-btn { padding:7px 14px; font-size:.78rem; border-radius:8px; cursor:pointer; transition:all .25s; font-family:inherit; background:rgba(34,211,238,.1); border:1px solid rgba(34,211,238,.4); color:var(--accent-3); }
+  .ai-btn:hover { background:rgba(34,211,238,.3); }
+  .ai-btn:disabled { opacity:.5; cursor:wait; }
+  .ai-loading { display:flex; align-items:center; gap:8px; color:var(--accent-3); font-size:.85rem; margin-top:10px; }
+  .ai-loading .spinner { width:18px; height:18px; border:2px solid rgba(34,211,238,.3); border-top-color:var(--accent-3); border-radius:50%; animation:spin .8s linear infinite; }
+  @keyframes spin { to { transform:rotate(360deg); } }
+  .ai-response { margin-top:12px; padding:14px 16px; background:rgba(139,92,246,.08); border-left:3px solid var(--accent-2); border-radius:8px; font-size:.88rem; line-height:1.65; color:var(--text); animation:fadeUp .3s ease; }
+  .ai-response h5 { color:var(--accent-3); margin:12px 0 6px; }
+  .ai-response ul { margin:6px 0 6px 18px; }
+  .ai-response li { margin-bottom:4px; }
+  .ai-response code { background:rgba(139,92,246,.15); padding:2px 6px; border-radius:4px; font-family:'Courier New', monospace; color:var(--accent-3); font-size:.87em; }
+  .ai-assistant { max-width:560px; margin:0 auto; background:var(--card); border:1px solid var(--border); border-radius:var(--radius); padding:20px; margin-bottom:20px; display:none; }
+  .ai-assistant.show { display:block; animation:fadeUp .4s ease; }
+  .ai-assistant h4 { color:var(--accent-3); margin-bottom:12px; }
+  .ai-assistant p { color:var(--muted); font-size:.85rem; margin-bottom:10px; }
+  .ai-assistant-row { display:flex; gap:8px; }
+  .ai-assistant-row input { flex:1; min-width:0; padding:12px 14px; background:color-mix(in srgb, var(--bg-1) 70%, transparent); border:1px solid var(--border); border-radius:10px; color:var(--text); font-size:.95rem; outline:none; font-family:inherit; }
+  .ai-assistant-row input:focus { border-color:var(--accent-3); }
+  .ai-answer { margin-top:12px; padding:14px 16px; background:rgba(139,92,246,.08); border-left:3px solid var(--accent-2); border-radius:8px; font-size:.88rem; line-height:1.65; color:var(--text); display:none; }
+  .ai-answer.show { display:block; animation:fadeUp .3s ease; }
+  .ai-error { color:var(--accent-1); font-size:.82rem; margin-top:8px; }
+
+  @media (max-width:600px) {
+    header { padding:10px 12px; }
+    nav button { padding:5px 9px; font-size:.75rem; }
+    main { padding:24px 12px 60px; }
+    .calc-btn { padding:12px; font-size:.95rem; }
+    .timer-display { font-size:2.6rem; }
+    .logo { font-size:1rem; }
+  }
+
+  /* ===== Максик: AI-ассистент ===== */
+  .maxik-btn { position:fixed; bottom:22px; right:22px; z-index:1000; width:62px; height:62px; border-radius:50%; border:none; cursor:pointer; background:linear-gradient(135deg,var(--accent-1),var(--accent-2),var(--accent-3)); background-size:220% 220%; animation:gradientShift 5s ease infinite; box-shadow:0 10px 32px color-mix(in srgb, var(--accent-2) 60%, transparent); display:flex; align-items:center; justify-content:center; transition:transform .25s, box-shadow .25s; }
+  .maxik-btn::before { content:''; position:absolute; inset:-6px; border-radius:50%; background:color-mix(in srgb, var(--accent-2) 45%, transparent); filter:blur(12px); z-index:-1; animation:glowPulse 2.6s ease-in-out infinite; }
+  @keyframes glowPulse { 0%,100% { opacity:.55; transform:scale(1); } 50% { opacity:1; transform:scale(1.12); } }
+  .maxik-btn .maxik-robot { width:37px; height:37px; position:relative; z-index:1; filter:drop-shadow(0 3px 5px rgba(0,0,0,.28)); }
+  .maxik-btn:hover { transform:scale(1.08); }
+  .maxik-btn:hover .maxik-robot { animation:robotWiggle .45s ease; }
+  @keyframes robotWiggle { 0%,100% { transform:rotate(0); } 30% { transform:rotate(-7deg); } 60% { transform:rotate(6deg); } }
+  .maxik-badge { position:absolute; top:-3px; right:-3px; width:23px; height:23px; border-radius:50%; background:linear-gradient(135deg,#ff2d87,#ff5fa2); color:#fff; display:flex; align-items:center; justify-content:center; border:2px solid color-mix(in srgb, var(--bg-1) 85%, transparent); box-shadow:0 0 14px rgba(255,45,135,.75); animation:badgeBounce 2.2s ease-in-out infinite; transition:opacity .3s, transform .3s; }
+  .maxik-badge.hide { opacity:0; transform:scale(.4); pointer-events:none; }
+  .maxik-badge svg { width:13px; height:13px; }
+  @keyframes badgeBounce { 0%,100% { transform:translateY(0) scale(1); } 18% { transform:translateY(-7px) scale(1.12); } 36% { transform:translateY(0) scale(1); } 54% { transform:translateY(-3.5px) scale(1.06); } 72% { transform:translateY(0) scale(1); } }
+
+  .maxik-panel { position:fixed; bottom:92px; right:22px; z-index:999; width:370px; max-width:calc(100vw - 24px); display:flex; flex-direction:column; background:var(--card); border:1px solid var(--border); border-radius:22px; backdrop-filter:blur(22px); -webkit-backdrop-filter:blur(22px); overflow:hidden; box-shadow:0 25px 70px rgba(0,0,0,.4); transform:translateY(18px) scale(.95); opacity:0; pointer-events:none; transition:all .32s cubic-bezier(.2,.9,.3,1.15); }
+  .maxik-panel.open { transform:translateY(0) scale(1); opacity:1; pointer-events:auto; }
+
+  .maxik-head { padding:14px 16px; display:flex; align-items:center; gap:12px; background:linear-gradient(135deg, color-mix(in srgb, var(--accent-2) 28%, transparent), color-mix(in srgb, var(--accent-1) 22%, transparent)); border-bottom:1px solid var(--border); }
+  .maxik-av { width:50px; height:50px; border-radius:50%; display:flex; align-items:center; justify-content:center; background:radial-gradient(circle at 30% 25%, rgba(255,255,255,.92), color-mix(in srgb, var(--bg-1) 60%, #fff)); border:1px solid var(--border); box-shadow:0 4px 14px rgba(0,0,0,.25); flex-shrink:0; }
+  .maxik-av .maxik-robot { width:42px; height:42px; filter:drop-shadow(0 2px 4px rgba(0,0,0,.2)); animation:avFloat 3.5s ease-in-out infinite; }
+  @keyframes avFloat { 0%,100% { transform:translateY(0) rotate(-2deg); } 50% { transform:translateY(-3px) rotate(2deg); } }
+  .maxik-name { font-weight:800; font-size:1rem; letter-spacing:.3px; }
+  .maxik-status { font-size:.74rem; color:#34d399; display:flex; align-items:center; gap:6px; margin-top:2px; }
+  .maxik-status::before { content:''; width:8px; height:8px; border-radius:50%; background:#34d399; box-shadow:0 0 8px #34d399; animation:dotBlink 2s ease infinite; }
+  @keyframes dotBlink { 0%,100% { opacity:1; } 50% { opacity:.35; } }
+  .maxik-close { margin-left:auto; width:32px; height:32px; border-radius:50%; border:1px solid var(--border); background:transparent; color:var(--muted); cursor:pointer; transition:all .2s; font-size:.85rem; font-family:inherit; }
+  .maxik-close:hover { background:color-mix(in srgb, var(--accent-1) 20%, transparent); color:var(--text); transform:rotate(90deg); }
+
+  .maxik-msgs { flex:1; overflow-y:auto; padding:14px; display:flex; flex-direction:column; gap:10px; min-height:170px; max-height:330px; scrollbar-width:thin; scrollbar-color:rgba(139,92,246,.4) transparent; }
+  .maxik-msg { display:flex; gap:8px; animation:fadeUp .3s ease; }
+  .maxik-msg.maxik-user { justify-content:flex-end; }
+  .maxik-bbot-av { width:26px; height:26px; border-radius:50%; flex-shrink:0; display:flex; align-items:center; justify-content:center; background:linear-gradient(135deg,var(--accent-1),var(--accent-3)); font-size:.75rem; box-shadow:0 2px 8px color-mix(in srgb, var(--accent-2) 40%, transparent); }
+  .maxik-bbot-av svg { width:17px; height:17px; filter:drop-shadow(0 1px 2px rgba(0,0,0,.25)); }
+  .maxik-bubble { max-width:80%; padding:10px 13px; border-radius:16px; font-size:.87rem; line-height:1.55; word-break:break-word; }
+  .maxik-bubble h5 { color:var(--accent-3); margin:8px 0 4px; font-size:.9rem; }
+  .maxik-bubble ul { margin:4px 0 4px 16px; }
+  .maxik-bubble li { margin-bottom:3px; }
+  .maxik-bubble code { background:rgba(139,92,246,.15); padding:1px 5px; border-radius:4px; font-family:'Courier New', monospace; font-size:.85em; color:var(--accent-3); }
+  .maxik-bot .maxik-bubble { background:color-mix(in srgb, var(--bg-1) 62%, transparent); border:1px solid var(--border); border-top-left-radius:6px; }
+  .maxik-user .maxik-bubble { background:linear-gradient(135deg,var(--accent-1),var(--accent-2)); background-size:200% 200%; animation:gradientShift 4s ease infinite; color:#fff; border-top-right-radius:6px; }
+  .maxik-dot { display:inline-block; width:6px; height:6px; border-radius:50%; background:var(--accent-3); margin-right:3px; animation:dotBounce 1.2s ease-in-out infinite; }
+  .maxik-dot:nth-child(2) { animation-delay:.15s; }
+  .maxik-dot:nth-child(3) { animation-delay:.3s; }
+  @keyframes dotBounce { 0%,60%,100% { transform:translateY(0); opacity:.35; } 30% { transform:translateY(-5px); opacity:1; } }
+
+  .maxik-chips { display:flex; gap:6px; padding:2px 14px 12px; flex-wrap:wrap; }
+  .maxik-chip { font-size:.74rem; padding:6px 12px; border-radius:999px; cursor:pointer; background:color-mix(in srgb, var(--accent-2) 12%, transparent); border:1px solid var(--border); color:var(--muted); transition:all .2s; font-family:inherit; }
+  .maxik-chip:hover { color:var(--accent-3); border-color:var(--accent-3); background:color-mix(in srgb, var(--accent-3) 12%, transparent); transform:translateY(-1px); }
+
+  .maxik-input-row { display:flex; gap:8px; padding:12px; border-top:1px solid var(--border); background:color-mix(in srgb, var(--bg-1) 40%, transparent); }
+  .maxik-input { flex:1; min-width:0; padding:11px 15px; border-radius:999px; border:1px solid var(--border); background:color-mix(in srgb, var(--bg-1) 70%, transparent); color:var(--text); font-size:.88rem; outline:none; font-family:inherit; }
+  .maxik-input:focus { border-color:var(--accent-3); box-shadow:0 0 14px color-mix(in srgb, var(--accent-3) 35%, transparent); }
+  .maxik-send { width:42px; height:42px; border-radius:50%; border:none; cursor:pointer; background:linear-gradient(135deg,var(--accent-1),var(--accent-2)); background-size:200% 200%; animation:gradientShift 4s ease infinite; color:#fff; font-size:1.05rem; transition:transform .2s, box-shadow .2s; flex-shrink:0; display:flex; align-items:center; justify-content:center; }
+  .maxik-send:hover { transform:scale(1.1); box-shadow:0 4px 16px color-mix(in srgb, var(--accent-2) 60%, transparent); }
+
+  @media (max-width:600px) {
+    .maxik-panel { left:12px; right:12px; bottom:84px; width:auto; }
+    .maxik-msgs { max-height:46vh; }
+  }
+</style>
+</head>
+<body>
+
+<div class="grid-bg"></div>
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+<div class="orb orb-3"></div>
+<div id="particles"></div>
+
+<header>
+  <div class="logo">ALISA SCHOOL</div>
+  <nav id="mainNav">
+    <button class="active" onclick="showPage('home', this)">Главная</button>
+    <button onclick="showPage('subjects', this)">Предметы</button>
+    <button onclick="showPage('tests', this)">Тесты</button>
+    <button onclick="showPage('tasks', this)">Задачки</button>
+    <button onclick="showPage('calc', this)">Калькулятор</button>
+    <button onclick="showPage('tools', this)">Инструменты</button>
+    <button onclick="showPage('customize', this)">Настройки</button>
+  </nav>
+  <div class="header-actions">
+    <button class="icon-btn" onclick="toggleSound()" id="soundBtn" title="Звук">🔊</button>
+    <button class="icon-btn" onclick="toggleTheme()" id="themeBtn" title="Тема">🌙</button>
+  </div>
+</header>
+
+<main>
+  <section id="home" class="page active">
+    <div class="hero">
+      <span class="tag">Для школьников 5–11 класс</span>
+      <h1>ALISA SCHOOL</h1>
+      <p>Темы с подробным материалом, тесты с похвалой и разбором ошибок, задачки с решением, поиск по содержанию, калькулятор с дробями и столбиком, дискриминант, факты, конвертер, шпаргалки и кастомизация.</p>
+    </div>
+    <div class="stats">
+      <div class="stat"><div class="num" id="statTopics">0</div><div class="label">Тем всего</div></div>
+      <div class="stat"><div class="num" id="statLearned">0</div><div class="label">Изучено</div></div>
+      <div class="stat"><div class="num" id="statTests">0</div><div class="label">Тестов</div></div>
+      <div class="stat"><div class="num" id="statSubjects">0</div><div class="label">Предметов</div></div>
+    </div>
+    <div class="grid">
+      <div class="card"><span class="icon">📚</span><h3>Предметы и темы</h3><p>Объяснения, материал, поиск по содержанию.</p><button class="btn" onclick="showPage('subjects', document.querySelectorAll('#mainNav button')[1])">Открыть</button></div>
+      <div class="card"><span class="icon">📝</span><h3>Тесты</h3><p>9 предметов, похвала, разбор ошибок, рекомендации.</p><button class="btn" onclick="showPage('tests', document.querySelectorAll('#mainNav button')[2])">Пройти</button></div>
+      <div class="card"><span class="icon">✏️</span><h3>Задачки</h3><p>Задачи по предметам с проверкой и решением.</p><button class="btn" onclick="showPage('tasks', document.querySelectorAll('#mainNav button')[3])">Решать</button></div>
+      <div class="card"><span class="icon">🧮</span><h3>Калькулятор</h3><p>Обычный, дроби, столбиком, дискриминант.</p><button class="btn" onclick="showPage('calc', document.querySelectorAll('#mainNav button')[4])">Открыть</button></div>
+      <div class="card"><span class="icon">💡</span><h3>Факты</h3><p>По предметам, кнопка случайного факта.</p><button class="btn" onclick="showPage('tools', document.querySelectorAll('#mainNav button')[5]); openTool('fact')">Узнать</button></div>
+      <div class="card"><span class="icon">🎨</span><h3>Настройки</h3><p>Тема, шрифт, акценты.</p><button class="btn" onclick="showPage('customize', document.querySelectorAll('#mainNav button')[6])">Настроить</button></div>
+    </div>
+  </section>
+
+  <section id="subjects" class="page">
+    <div class="hero">
+      <span class="tag">Обучение</span>
+      <h1>Предметы и темы</h1>
+      <p>Выбери класс, предмет. Поиск ищет по названию, объяснению и полному материалу.</p>
+    </div>
+    <div class="grades" id="gradeButtons"></div>
+    <div class="search-box"><input type="text" id="topicSearch" placeholder="Поиск по темам и содержанию..." oninput="globalSearch()"></div>
+    <div class="ai-assistant" id="aiAssistant">
+      <h4>🤖 AI-ассистент</h4>
+      <p>Задай вопрос по текущему предмету или теме. Отвечает Google Gemini.</p>
+      <div class="ai-assistant-row">
+        <input type="text" id="aiQuestion" placeholder="Например: объясни про дроби" onkeydown="if(event.key==='Enter')askAI()">
+        <button class="btn" id="aiAskBtn" onclick="askAI()">Спросить</button>
+      </div>
+      <div class="ai-answer" id="aiAnswer"></div>
+    </div>
+    <div class="subjects-row" id="subjectsRow"></div>
+    <div class="topics-wrap" id="topicsWrap"></div>
+    <div id="searchResults" class="topics-wrap" style="display:none;"></div>
+  </section>
+
+  <section id="tests" class="page">
+    <div class="hero">
+      <span class="tag">Проверка знаний</span>
+      <h1>Тесты по предметам</h1>
+      <p>За верный ответ — похвала. В конце — разбор ошибок и рекомендации.</p>
+    </div>
+    <div class="grades" id="testSubjectsRow"></div>
+    <div class="test-wrap" id="testWrap"></div>
+  </section>
+
+  <section id="tasks" class="page">
+    <div class="hero">
+      <span class="tag">Практика</span>
+      <h1>Задачки</h1>
+      <p>Выбери предмет и уровень. Реши задачу — проверь себя.</p>
+    </div>
+    <div class="grades" id="taskSubjectsRow"></div>
+    <div class="grades" id="taskLevelsRow"></div>
+    <div class="task-wrap" id="taskWrap"></div>
+  </section>
+
+  <section id="calc" class="page">
+    <div class="hero"><span class="tag">Инструмент</span><h1>Калькулятор</h1><p>Обычный, дроби, столбиком, дискриминант.</p></div>
+    <div class="calc-tabs">
+      <button class="calc-tab active" onclick="switchCalc('basic', this)">Обычный</button>
+      <button class="calc-tab" onclick="switchCalc('frac', this)">Дроби</button>
+      <button class="calc-tab" onclick="switchCalc('column-mul', this)">Умножение столбиком</button>
+      <button class="calc-tab" onclick="switchCalc('column-div', this)">Деление столбиком</button>
+      <button class="calc-tab" onclick="switchCalc('disc', this)">Дискриминант</button>
+    </div>
+    <div class="calc-panel active" id="calc-basic"><div class="calc"><div class="calc-history" id="calcHistory"></div><div class="calc-display" id="calcDisplay">0</div><div class="calc-grid" id="calcGrid"></div></div></div>
+    <div class="calc-panel" id="calc-frac"><div class="calc"><div class="frac-row"><input type="number" class="calc-field" id="f1n" value="1"><span>/</span><input type="number" class="calc-field" id="f1d" value="2"></div><select class="calc-field" id="fracOp"><option value="+">+</option><option value="-">−</option><option value="*">×</option><option value="/">÷</option></select><div class="frac-row"><input type="number" class="calc-field" id="f2n" value="1"><span>/</span><input type="number" class="calc-field" id="f2d" value="3"></div><button class="btn" onclick="calcFrac()" style="width:100%; margin-top:8px;">Посчитать</button><div class="calc-output" id="fracOut"></div></div></div>
+    <div class="calc-panel" id="calc-column-mul"><div class="calc"><input type="number" class="calc-field" id="mulA" value="234"><input type="number" class="calc-field" id="mulB" value="56"><button class="btn" onclick="columnMul()" style="width:100%;">Умножить</button><div class="calc-output" id="mulOut"></div></div></div>
+    <div class="calc-panel" id="calc-column-div"><div class="calc"><input type="number" class="calc-field" id="divA" value="144"><input type="number" class="calc-field" id="divB" value="12"><button class="btn" onclick="columnDiv()" style="width:100%;">Разделить</button><div class="calc-output" id="divOut"></div></div></div>
+    <div class="calc-panel" id="calc-disc"><div class="calc"><input type="number" class="calc-field" id="dA" value="1"><input type="number" class="calc-field" id="dB" value="-5"><input type="number" class="calc-field" id="dC" value="6"><button class="btn" onclick="calcDisc()" style="width:100%;">Найти корни</button><div class="calc-output" id="discOut"></div></div></div>
+  </section>
+
+  <section id="tools" class="page">
+    <div class="hero"><span class="tag">Полезное</span><h1>Инструменты</h1><p>Факты, тренажёры, конвертеры, шпаргалки.</p></div>
+    <div class="grades">
+      <button class="grade-btn active" onclick="openTool('fact', this)">Факты</button>
+      <button class="grade-btn" onclick="openTool('mult', this)">Таблица умножения</button>
+      <button class="grade-btn" onclick="openTool('nums', this)">Системы счисления</button>
+      <button class="grade-btn" onclick="openTool('conv', this)">Конвертер</button>
+      <button class="grade-btn" onclick="openTool('words', this)">Счётчик слов</button>
+      <button class="grade-btn" onclick="openTool('cheat', this)">Шпаргалки</button>
+      <button class="grade-btn" onclick="openTool('timer', this)">Таймер</button>
+      <button class="grade-btn" onclick="openTool('notes', this)">Заметки</button>
+    </div>
+    <div id="tool-fact" class="tool-panel active"><div class="fact-box"><div style="font-size:2rem;">💡</div><div class="fact-subjects" id="factSubjects"></div><div class="fact-text" id="factText">Выбери предмет и нажми кнопку.</div><button class="btn" onclick="newFact()">Новый факт</button></div></div>
+    <div id="tool-mult" class="tool-panel"><div class="mult-wrap"><div class="mult-levels"><button class="btn-sm" onclick="setMultLevel(1, this)">До 5</button><button class="btn-sm active" onclick="setMultLevel(2, this)">До 10</button><button class="btn-sm" onclick="setMultLevel(3, this)">До 20</button><button class="btn-sm" onclick="setMultLevel(4, this)">Сложный (до 50)</button></div><div class="mult-q" id="multQ">7 × 8</div><input type="number" class="mult-input" id="multAnswer" placeholder="?"><div style="margin-top:12px;"><button class="btn" onclick="checkMult()">Проверить</button> <button class="btn" style="background:rgba(139,92,246,0.2);" onclick="newMult()">Другой</button></div><div class="mult-status" id="multStatus"></div><div style="margin-top:12px; color:var(--muted); font-size:0.85rem;">Правильно: <b id="multScore" style="color:#34d399;">0</b> · Ошибок: <b id="multWrong" style="color:var(--accent-1);">0</b></div></div></div>
+    <div id="tool-nums" class="tool-panel"><div class="num-box"><input type="text" id="numInput" value="42"><div style="color:var(--muted); font-size:0.82rem; margin-bottom:10px;">Форматы: 42 (10-я), 1010b (2-я), 777o (8-я), FFh (16-я)</div><div class="num-out" id="numOut"></div></div></div>
+    <div id="tool-conv" class="tool-panel"><div class="conv-box"><input type="number" id="convInput" value="1"><select id="convFrom"><optgroup label="Длина"><option value="m|km">Метры → Километры</option><option value="km|m">Километры → Метры</option><option value="m|cm">Метры → Сантиметры</option><option value="cm|m">Сантиметры → Метры</option><option value="m|mm">Метры → Миллиметры</option></optgroup><optgroup label="Масса"><option value="kg|g">Килограммы → Граммы</option><option value="g|kg">Граммы → Килограммы</option><option value="t|kg">Тонны → Килограммы</option></optgroup><optgroup label="Температура"><option value="c|f">Цельсий → Фаренгейт</option><option value="f|c">Фаренгейт → Цельсий</option><option value="c|k">Цельсий → Кельвин</option></optgroup><optgroup label="Время"><option value="h|min">Часы → Минуты</option><option value="min|s">Минуты → Секунды</option><option value="h|s">Часы → Секунды</option><option value="d|h">Дни → Часы</option></optgroup></select><div class="conv-result" id="convResult"></div></div></div>
+    <div id="tool-words" class="tool-panel"><div class="word-box"><textarea id="wordArea" placeholder="Вставь текст..."></textarea><div class="word-stats"><span>Слов: <b id="wWords">0</b></span><span>Символов: <b id="wChars">0</b></span><span>Без пробелов: <b id="wNoSpace">0</b></span><span>Предложений: <b id="wSent">0</b></span></div></div></div>
+    <div id="tool-cheat" class="tool-panel"><div class="grades" id="cheatSubjects"></div><div class="grades" id="cheatGrades"></div><div class="cheat-grid" id="cheatGrid"></div></div>
+    <div id="tool-timer" class="tool-panel"><div class="timer-box"><div class="timer-display" id="timerDisplay">25:00</div><div class="timer-modes"><button class="btn-sm" onclick="setTimer(25)">25 мин</button><button class="btn-sm" onclick="setTimer(15)">15 мин</button><button class="btn-sm" onclick="setTimer(5)">5 мин</button><button class="btn-sm" onclick="setTimer(1)">1 мин</button></div><button class="btn" onclick="toggleTimer()" id="timerBtn">Старт</button> <button class="btn" style="background:rgba(139,92,246,0.2);" onclick="resetTimer()">Сброс</button></div></div>
+    <div id="tool-notes" class="tool-panel"><div class="notes-box"><textarea id="notesArea" placeholder="Заметки сохраняются автоматически..."></textarea><div class="notes-status" id="notesStatus"></div><div style="margin-top:10px; text-align:center;"><button class="btn-sm" onclick="exportNotes()">Экспорт</button> <button class="btn-sm" onclick="clearNotes()">Очистить</button></div></div></div>
+  </section>
+
+  <section id="customize" class="page">
+    <div class="hero"><span class="tag">Персонализация</span><h1>Настрой под себя</h1><p>Тема, акценты, шрифт — всё сохраняется.</p></div>
+    <div class="customize-grid">
+      <div class="custom-block"><h4>Цветовая схема</h4><div class="theme-swatches"><div class="swatch swatch-default active" onclick="setAccent('default', this)"></div><div class="swatch swatch-neon" onclick="setAccent('neon', this)"></div><div class="swatch swatch-sun" onclick="setAccent('sun', this)"></div><div class="swatch swatch-ocean" onclick="setAccent('ocean', this)"></div></div></div>
+      <div class="custom-block"><h4>Размер шрифта</h4><input type="range" min="14" max="20" value="16" id="fontRange" oninput="setFont(this.value)"><div style="color:var(--muted); font-size:0.8rem; margin-top:6px;">Текущий: <span id="fontVal">16</span> px</div></div>
+      <div class="custom-block"><h4>Светлая / тёмная</h4><button class="btn-sm" onclick="toggleTheme()">Переключить</button></div>
+      <div class="custom-block"><h4>Звук</h4><button class="btn-sm" onclick="toggleSound()">Вкл / выкл</button></div>
+      <div class="custom-block"><h4>Сброс</h4><button class="btn-sm" onclick="resetAll()">Сбросить всё</button></div>
+    </div>
+  </section>
+</main>
+
+<footer>ALISA SCHOOL · учебный проект · 2026</footer>
+
+<script>
+(function() {
+  const wrap = document.getElementById('particles');
+  const colors = ['#22d3ee', '#ff5fa2', '#8b5cf6', '#34d399', '#fbbf24'];
+  for (let i = 0; i < 40; i++) {
+    const p = document.createElement('div');
+    p.className = 'particle';
+    const size = 2 + Math.random() * 4;
+    const c = colors[Math.floor(Math.random() * colors.length)];
+    p.style.width = size + 'px';
+    p.style.height = size + 'px';
+    p.style.left = Math.random() * 100 + 'vw';
+    p.style.background = c;
+    p.style.boxShadow = '0 0 10px ' + c;
+    p.style.animationDuration = (8 + Math.random() * 12) + 's';
+    p.style.animationDelay = (Math.random() * 10) + 's';
+    wrap.appendChild(p);
+  }
+})();
+
+function showPage(id, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelectorAll('#mainNav button').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function toggleTheme() {
+  document.body.classList.toggle('light');
+  document.getElementById('themeBtn').textContent = document.body.classList.contains('light') ? '☀️' : '🌙';
+  localStorage.setItem('alisa_theme', document.body.classList.contains('light') ? 'light' : 'dark');
+}
+let soundOn = localStorage.getItem('alisa_sound') !== 'off';
+function toggleSound() {
+  soundOn = !soundOn;
+  document.getElementById('soundBtn').textContent = soundOn ? '🔊' : '🔇';
+  document.getElementById('soundBtn').classList.toggle('off', !soundOn);
+  localStorage.setItem('alisa_sound', soundOn ? 'on' : 'off');
+}
+function beep(freq = 600, dur = 0.08) {
+  if (!soundOn) return;
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.frequency.value = freq;
+    osc.type = 'sine';
+    osc.connect(gain); gain.connect(ctx.destination);
+    gain.gain.setValueAtTime(0.07, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + dur);
+    osc.start(); osc.stop(ctx.currentTime + dur);
+  } catch(e) {}
+}
+function setAccent(name, el) {
+  document.body.classList.remove('theme-neon', 'theme-sun', 'theme-ocean');
+  if (name !== 'default') document.body.classList.add('theme-' + name);
+  document.querySelectorAll('.swatch').forEach(s => s.classList.remove('active'));
+  if (el) el.classList.add('active');
+  localStorage.setItem('alisa_accent', name);
+}
+function setFont(size) {
+  document.documentElement.style.fontSize = size + 'px';
+  document.getElementById('fontVal').textContent = size;
+  localStorage.setItem('alisa_font', size);
+}
+function resetAll() {
+  if (!confirm('Сбросить всё?')) return;
+  localStorage.clear();
+  location.reload();
+}
+if (localStorage.getItem('alisa_theme') === 'light') { document.body.classList.add('light'); document.getElementById('themeBtn').textContent = '☀️'; }
+if (!soundOn) { document.getElementById('soundBtn').textContent = '🔇'; document.getElementById('soundBtn').classList.add('off'); }
+const savedAccent = localStorage.getItem('alisa_accent') || 'default';
+document.querySelectorAll('.swatch').forEach((s, i) => { const n = ['default','neon','sun','ocean']; if (n[i] === savedAccent) { s.classList.add('active'); setAccent(savedAccent, s); } });
+const savedFont = localStorage.getItem('alisa_font');
+if (savedFont) { document.getElementById('fontRange').value = savedFont; setFont(savedFont); }
+
+const praises = ['Отлично! ✓','Верно! ✓','Молодец! ✓','Супер! ✓','Точно! ✓','Умница! ✓','Точно в цель! ✓','Браво! ✓','Красавчик! ✓','Так держать! ✓','Именно так! ✓','Класс! ✓','Гениально! ✓','Правильно! ✓','Блестяще! ✓','Ты справился! ✓'];
+function getPraise() { return praises[Math.floor(Math.random() * praises.length)]; }
+
+function stripHtml(html) { const t = document.createElement('div'); t.innerHTML = html || ''; return t.textContent || ''; }
+
+// ============ AI (Google Gemini) ============
+const API_BASE = '';
+
+function apiError(resp, detail) {
+  if (/quota|RESOURCE_EXHAUSTED|429|limit/i.test(detail)) return 'Запросов к Gemini сейчас слишком много (лимит бесплатного тарифа). Подожди ~1 минуту и попробуй снова.';
+  if (resp && resp.status === 500) return 'AI-сервис временно недоступен: ' + detail.slice(0, 140);
+  return 'Ошибка сервера: ' + resp.status;
+}
+
+async function aiFetch(path, body) {
+  let resp;
+  try {
+    resp = await fetch(API_BASE + path, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+  } catch (e) {
+    throw new Error('Не удалось связаться с сервером. Обнови страницу и повтори.');
+  }
+  if (!resp.ok) {
+    let detail = '';
+    try { const j = await resp.json(); detail = j.detail || ''; } catch (e) {}
+    throw new Error(apiError(resp, detail));
+  }
+  return resp.json();
+}
+
+function showAILoading(el, text) {
+  el.innerHTML = '<div class="ai-loading"><span class="spinner"></span> ' + (text || 'Gemini думает...') + '</div>';
+}
+
+function clearAILoading(el) { if (el && el.querySelector('.ai-loading')) el.innerHTML = ''; }
+
+function explainWithAI(grade, subject, topic, btn, container) {
+  if (btn) { btn.disabled = true; btn.textContent = 'Загрузка...'; }
+  container.style.display = 'block';
+  showAILoading(container, 'Gemini объясняет тему...');
+  aiFetch('/api/explain', { grade, subject, topic })
+    .then(res => {
+      clearAILoading(container);
+      container.innerHTML = '<div class="ai-response">' + res.explanation + '</div>';
+      beep(900, 0.1);
+    })
+    .catch(err => {
+      clearAILoading(container);
+      container.innerHTML = '<div class="ai-error">⚠️ Не удалось связаться с Gemini: ' + err.message + '</div>';
+      beep(300, 0.15);
+    })
+    .finally(() => { if (btn) { btn.disabled = false; btn.textContent = 'AI объяснить'; } });
+}
+
+function askAI() {
+  const input = document.getElementById('aiQuestion');
+  const answer = document.getElementById('aiAnswer');
+  const btn = document.getElementById('aiAskBtn');
+  const q = input.value.trim();
+  if (!q) return;
+  answer.classList.add('show');
+  showAILoading(answer, 'Gemini отвечает...');
+  btn.disabled = true;
+  aiFetch('/api/ask', { grade: currentGrade, subject: currentSubject || '', question: q })
+    .then(res => {
+      clearAILoading(answer);
+      answer.innerHTML = res.answer;
+      beep(900, 0.1);
+    })
+    .catch(err => {
+      clearAILoading(answer);
+      answer.innerHTML = '<div class="ai-error">⚠️ ' + err.message + '</div>';
+      beep(300, 0.15);
+    })
+    .finally(() => { btn.disabled = false; });
+}
+
+// ============ ДАННЫЕ ============
+const data = {
+  '5': {
+    'Математика': [
+      { t: 'Натуральные числа', e: '<span class="def">Числа для счёта: 1, 2, 3, 4...</span><span class="rule">a + b = b + a</span><span class="example">5 + 3 = 8</span><span class="note">Ноль не натуральное.</span>' },
+      { t: 'Обыкновенные дроби', e: '<span class="def">Дробь — часть целого.</span><span class="rule">a/b + c/b = (a+c)/b</span><span class="example">3/4</span><span class="note">Знаменатель ≠ 0.</span>' },
+      { t: 'Уравнения', e: '<span class="def">Равенство с неизвестным.</span><span class="rule">x + a = b → x = b − a</span><span class="example">x + 5 = 12 → x = 7</span><span class="note">Проверка.</span>' },
+      { t: 'Геометрические фигуры', e: '<span class="def">Треугольник, квадрат, круг.</span><span class="rule">P = 4a, S = a²</span><span class="example">a = 5 → P = 20</span><span class="note">Площадь в квадратных единицах.</span>' },
+      { t: 'Проценты', e: '<span class="def">Одна сотая часть.</span><span class="rule">a% от b = a·b/100</span><span class="example">20% от 150 = 30</span><span class="note">100% — всё.</span>' },
+      { t: 'Единицы измерения', e: '<span class="def">Длина, масса, время.</span><span class="rule">1 км = 1000 м</span><span class="example">2.5 км = 2500 м</span><span class="note">Переводи в одну единицу.</span>' },
+      { t: 'Среднее арифметическое', e: '<span class="def">Сумма ÷ количество.</span><span class="rule">(a₁+a₂+...+aₙ)/n</span><span class="example">(2+4+6)/3 = 4</span><span class="note">Типичное значение.</span>' }
+    ],
+    'Русский язык': [
+      { t: 'Части речи', e: '<span class="def">Сущ., прил., глагол, наречие.</span><span class="rule">Каждая — свой вопрос</span><span class="example">стол — сущ.</span><span class="note">Местоимение заменяет сущ.</span>' },
+      { t: 'Орфография', e: '<span class="def">Безударные гласные — ударением.</span><span class="rule">вода → вóды</span><span class="example">л_сной → лес</span><span class="note">Словарь.</span>' },
+      { t: 'Синтаксис', e: '<span class="def">Подлежащее + сказуемое.</span><span class="rule">Грамматическая основа</span><span class="example">Мальчик читает.</span><span class="note">Второстепенные члены.</span>' },
+      { t: 'Состав слова', e: '<span class="def">Приставка, корень, суффикс, окончание.</span><span class="rule">Корень — главная</span><span class="example">по-ход-н-ый</span><span class="note">Окончание меняется.</span>' }
+    ],
+    'История': [
+      { t: 'Древний мир', e: '<span class="def">До падения Рима.</span><span class="rule">~3000 до н.э. — 476 н.э.</span><span class="example">пирамиды</span><span class="note">Шумер — письменность.</span>' },
+      { t: 'Средние века', e: '<span class="def">V–XV век.</span><span class="rule">Рюрик → Иван III</span><span class="example">Куликовская 1380</span><span class="note">Феодализм.</span>' }
+    ],
+    'Биология': [
+      { t: 'Растения', e: '<span class="def">Фотосинтез.</span><span class="rule">6CO₂ + 6H₂O → C₆H₁₂O₆ + 6O₂</span><span class="example">дуб, ромашка</span><span class="note">На свету.</span>' },
+      { t: 'Животные', e: '<span class="def">Гетеротрофы.</span><span class="rule">Позвоночные и беспозвоночные</span><span class="example">волк, орёл</span><span class="note">95% — беспозвоночные.</span>' }
+    ],
+    'География': [
+      { t: 'Планета Земля', e: '<span class="def">Третья от Солнца.</span><span class="rule">R ≈ 6371 км</span><span class="example">сутки = 24 ч</span><span class="note">Солнце встаёт на востоке.</span>' },
+      { t: 'Карты', e: '<span class="def">Уменьшенное изображение.</span><span class="rule">Масштаб 1:1000</span><span class="example">физическая карта</span><span class="note">Больше масштаб — подробнее.</span>' }
+    ]
+  },
+  '6': {
+    'Математика': [
+      { t: 'Делимость чисел', e: '<span class="def">Признаки делимости.</span><span class="rule">На 2, 3, 5, 9</span><span class="example">15 : 3 и 5</span><span class="note">Сумма цифр.</span>' },
+      { t: 'Дроби', e: '<span class="def">С разным знаменателем.</span><span class="rule">1/2 + 1/3 = 5/6</span><span class="example">НОК</span><span class="note">Общий знаменатель.</span>' },
+      { t: 'Пропорции', e: '<span class="def">a/b = c/d.</span><span class="rule">a·d = b·c</span><span class="example">2/4 = 3/6</span><span class="note">Крест-накрест.</span>' },
+      { t: 'Координаты', e: '<span class="def">X и Y.</span><span class="rule">(0,0) — начало</span><span class="example">A(3, 5)</span><span class="note">X — вправо.</span>' },
+      { t: 'НОД и НОК', e: '<span class="def">Общий делитель и кратное.</span><span class="rule">НОК = a·b/НОД</span><span class="example">НОД(12,18) = 6</span><span class="note">НОК — для дробей.</span>' },
+      { t: 'Отрицательные числа', e: '<span class="def">Со знаком −.</span><span class="rule">−(−a) = a</span><span class="example">−5 + 8 = 3</span><span class="note">Модуль — расстояние.</span>' }
+    ],
+    'Русский язык': [
+      { t: 'Лексика', e: '<span class="def">Синонимы, антонимы, омонимы.</span><span class="rule">Большой — огромный</span><span class="example">ключ (дверь/родник)</span><span class="note">Омонимы — одинаково.</span>' },
+      { t: 'Словообразование', e: '<span class="def">Приставочный, суффиксальный.</span><span class="rule">лес → лесник</span><span class="example">шёл → пришёл</span><span class="note">Сложные слова.</span>' },
+      { t: 'Причастие', e: '<span class="def">Признак по действию.</span><span class="rule">-ущ-, -ющ-</span><span class="example">читающий</span><span class="note">Действ. и страдат.</span>' },
+      { t: 'Деепричастие', e: '<span class="def">Добавочное действие.</span><span class="rule">-а, -я, -в</span><span class="example">читая</span><span class="note">Не изменяется.</span>' }
+    ],
+    'История': [
+      { t: 'Русь', e: '<span class="def">Центр — Киев.</span><span class="rule">882 — Олег</span><span class="example">988 — Крещение</span><span class="note">Русская правда.</span>' },
+      { t: 'Средневековая Европа', e: '<span class="def">Феодализм.</span><span class="rule">Крестовые походы</span><span class="example">Столетняя война</span><span class="note">Чёрная смерть.</span>' }
+    ],
+    'Биология': [
+      { t: 'Клетка', e: '<span class="def">Мембрана, цитоплазма, ядро.</span><span class="rule">Органоиды</span><span class="example">лук</span><span class="note">Митохондрии.</span>' },
+      { t: 'Бактерии', e: '<span class="def">Без ядра.</span><span class="rule">Деление</span><span class="example">кисломолочные</span><span class="note">Везде.</span>' },
+      { t: 'Грибы', e: '<span class="def">Отдельное царство.</span><span class="rule">Готовые вещества</span><span class="example">мукор</span><span class="note">Не растения.</span>' }
+    ],
+    'География': [
+      { t: 'Атмосфера', e: '<span class="def">Воздушная оболочка.</span><span class="rule">N₂ 78%, O₂ 21%</span><span class="example">облака</span><span class="note">Озон.</span>' },
+      { t: 'Гидросфера', e: '<span class="def">Водная оболочка.</span><span class="rule">96% солёная</span><span class="example">Байкал</span><span class="note">Пресной 4%.</span>' },
+      { t: 'Биосфера', e: '<span class="def">Оболочка жизни.</span><span class="rule">Границы размыты</span><span class="example">везде</span><span class="note">Организмы.</span>' }
+    ]
+  },
+  '7': {
+    'Алгебра': [
+      { t: 'Выражения с переменными', e: '<span class="def">Содержат буквы.</span><span class="rule">2x + 3 при x=4 → 11</span><span class="example">Подстановка</span><span class="note">Значение зависит от x.</span>' },
+      { t: 'Тождества', e: '<span class="def">Верны при любых значениях.</span><span class="rule">a + b = b + a</span><span class="example">2(x+3) = 2x+6</span><span class="note">Упрощение.</span>' },
+      { t: 'Линейные уравнения', e: '<span class="def">ax + b = 0.</span><span class="rule">x = −b/a</span><span class="example">3x − 6 = 0 → x = 2</span><span class="note">Одно решение.</span>' },
+      { t: 'Линейная функция', e: '<span class="def">y = kx + b.</span><span class="rule">Прямая</span><span class="example">y = 2x + 1</span><span class="note">k — наклон.</span>' },
+      { t: 'Степень с натуральным показателем', e: '<span class="def">aⁿ.</span><span class="rule">aᵐ·aⁿ = aᵐ⁺ⁿ</span><span class="example">2³ = 8</span><span class="note">a⁰ = 1.</span>' },
+      { t: 'Одночлены и многочлены', e: '<span class="def">Произведение и сумма.</span><span class="rule">Подобные складываем</span><span class="example">3x² + 5x² = 8x²</span><span class="note">Степень.</span>' },
+      { t: 'Формулы сокращённого умножения', e: '<span class="def">Упрощают.</span><span class="rule">(a+b)² = a²+2ab+b²</span><span class="example">(x+3)²</span><span class="note">a²−b² = (a−b)(a+b).</span>' },
+      { t: 'Системы уравнений', e: '<span class="def">Два уравнения.</span><span class="rule">Подстановка, сложение</span><span class="example">x+y=5, x−y=1</span><span class="note">Пара чисел.</span>' }
+    ],
+    'Геометрия': [
+      { t: 'Начальные сведения', e: '<span class="def">Точка, прямая, отрезок.</span><span class="rule">Через 2 точки — 1 прямая</span><span class="example">AB</span><span class="note">Прямая бесконечна.</span>' },
+      { t: 'Смежные и вертикальные углы', e: '<span class="def">180° и равны.</span><span class="rule">Смежные = 180°</span><span class="example">∠1 + ∠2</span><span class="note">Вертикальные равны.</span>' },
+      { t: 'Признаки равенства треугольников', e: '<span class="def">3 признака.</span><span class="rule">2 стороны + угол</span><span class="example">△ABC = △A₁B₁C₁</span><span class="note">Знать все три.</span>' },
+      { t: 'Равнобедренный треугольник', e: '<span class="def">2 стороны равны.</span><span class="rule">Углы при основании равны</span><span class="example">AB = BC</span><span class="note">Медиана = высота.</span>' },
+      { t: 'Параллельные прямые', e: '<span class="def">Не пересекаются.</span><span class="rule">Накрест лежащие</span><span class="example">∠1 = ∠2</span><span class="note">Односторонние 180°.</span>' },
+      { t: 'Прямоугольные треугольники', e: '<span class="def">Угол 90°.</span><span class="rule">Катет напротив 30° = половина гипотенузы</span><span class="example">AB/2</span><span class="note">Сумма острых = 90°.</span>' },
+      { t: 'Окружность и круг', e: '<span class="def">Линия и площадь.</span><span class="rule">C = 2πR, S = πR²</span><span class="example">R = 5</span><span class="note">π ≈ 3.14.</span>' }
+    ],
+    'Физика': [
+      { t: 'Механическое движение', e: '<span class="def">Изменение положения.</span><span class="rule">v = S/t</span><span class="example">100 км за 2 ч</span><span class="note">Тело отсчёта.</span>' },
+      { t: 'Скорость, путь, время', e: '<span class="def">3 величины.</span><span class="rule">v = S/t</span><span class="example">20 м за 4 с</span><span class="note">СИ.</span>' },
+      { t: 'Масса и плотность', e: '<span class="def">ρ = m/V.</span><span class="rule">Вода 1000 кг/м³</span><span class="example">железо 7800</span><span class="note">1 л = 0.001 м³.</span>' },
+      { t: 'Сила тяжести', e: '<span class="def">F = mg.</span><span class="rule">g ≈ 9.8</span><span class="example">10 кг → 98 Н</span><span class="note">Вниз.</span>' },
+      { t: 'Сила упругости', e: '<span class="def">F = kx.</span><span class="rule">Закон Гука</span><span class="example">k = 100, x = 0.05 → 5 Н</span><span class="note">Против деформации.</span>' },
+      { t: 'Сила трения', e: '<span class="def">F = μN.</span><span class="rule">Покоя и скольжения</span><span class="example">μ = 0.3</span><span class="note">Направлена против движения.</span>' },
+      { t: 'Давление', e: '<span class="def">p = F/S.</span><span class="rule">1 Па = 1 Н/м²</span><span class="example">F = 100, S = 0.5 → 200 Па</span><span class="note">Меньше площадь.</span>' },
+      { t: 'Давление жидкостей', e: '<span class="def">p = ρgh.</span><span class="rule">Закон Паскаля</span><span class="example">h = 10 м → 100 кПа</span><span class="note">От глубины.</span>' },
+      { t: 'Атмосферное давление', e: '<span class="def">Давление воздуха.</span><span class="rule">760 мм рт. ст.</span><span class="example">101325 Па</span><span class="note">С высотой уменьшается.</span>' },
+      { t: 'Работа и мощность', e: '<span class="def">A = F·S, P = A/t.</span><span class="rule">1 Дж, 1 Вт</span><span class="example">F=20, S=5 → 100 Дж</span><span class="note">Мощность — скорость работы.</span>' },
+      { t: 'Простые механизмы', e: '<span class="def">Рычаг, блок.</span><span class="rule">F₁L₁ = F₂L₂</span><span class="example">Равновесие</span><span class="note">Правило моментов.</span>' },
+      { t: 'Энергия', e: '<span class="def">Ek = mv²/2, Ep = mgh.</span><span class="rule">Ek + Ep = const</span><span class="example">Переход</span><span class="note">Сохраняется.</span>' }
+    ],
+    'Русский язык': [
+      { t: 'Причастие', e: '<span class="def">Признак по действию.</span><span class="rule">Действ. и страдат.</span><span class="example">читающий</span><span class="note">Оборот — запятые.</span>' },
+      { t: 'Деепричастие', e: '<span class="def">Добавочное действие.</span><span class="rule">-а, -я, -в</span><span class="example">читая</span><span class="note">Не изменяется.</span>' },
+      { t: 'Наречие', e: '<span class="def">Признак действия.</span><span class="rule">как? где? когда?</span><span class="example">быстро</span><span class="note">Не изменяется.</span>' },
+      { t: 'Служебные части речи', e: '<span class="def">Предлог, союз, частица.</span><span class="rule">Не члены</span><span class="example">в, и, не</span><span class="note">Не отвечают.</span>' },
+      { t: 'НЕ с частями речи', e: '<span class="def">Слитно или раздельно.</span><span class="rule">С глаголами — раздельно</span><span class="example">не хочу</span><span class="note">Исключения.</span>' }
+    ],
+    'История': [
+      { t: 'Россия в XVI веке', e: '<span class="def">Иван Грозный.</span><span class="rule">1547 — царь</span><span class="example">Опричнина 1565</span><span class="note">Расширение на восток.</span>' },
+      { t: 'Смутное время', e: '<span class="def">1598–1613.</span><span class="rule">Лжедмитрии</span><span class="example">1612 — ополчение</span><span class="note">Романовы 1613.</span>' },
+      { t: 'Россия в XVII веке', e: '<span class="def">Первые Романовы.</span><span class="rule">Раскол</span><span class="example">1654 — Украина</span><span class="note">Бунты.</span>' }
+    ],
+    'Биология': [
+      { t: 'Царства живой природы', e: '<span class="def">Растения, животные, грибы, бактерии.</span><span class="rule">Клеточное строение</span><span class="example">Все — живые</span><span class="note">Вирусы — не клетки.</span>' },
+      { t: 'Ткани и органы', e: '<span class="def">Группы клеток.</span><span class="rule">Эпителиальная, мышечная</span><span class="example">Сердце</span><span class="note">Системы органов.</span>' }
+    ],
+    'География': [
+      { t: 'Литосфера', e: '<span class="def">Твёрдая оболочка.</span><span class="rule">Плиты движутся</span><span class="example">Гималаи</span><span class="note">Землетрясения.</span>' },
+      { t: 'Материки и океаны', e: '<span class="def">6 и 5.</span><span class="rule">Евразия, Тихий</span><span class="example">Антарктида</span><span class="note">Самые большие.</span>' },
+      { t: 'Природные зоны', e: '<span class="def">Арктика, тундра, тайга.</span><span class="rule">Широтная зональность</span><span class="example">Тайга</span><span class="note">Зависят от климата.</span>' }
+    ]
+  },
+  '8': {
+    'Алгебра': [
+      { t: 'Квадратные корни', e: '<span class="def">√a.</span><span class="rule">√(ab) = √a·√b</span><span class="example">√16 = 4</span><span class="note">√ минуса — нет.</span>' },
+      { t: 'Квадратные уравнения', e: '<span class="def">ax² + bx + c = 0.</span><span class="rule">D = b²−4ac</span><span class="example">x²−5x+6=0</span><span class="note">Виета.</span>' },
+      { t: 'Неравенства', e: '<span class="def">Решаем как уравнения.</span><span class="rule">Знак меняется при ÷ на минус</span><span class="example">3x < 9 → x < 3</span><span class="note">Ответ — интервал.</span>' },
+      { t: 'Степени с целым показателем', e: '<span class="def">a⁻ⁿ = 1/aⁿ.</span><span class="rule">a⁰ = 1</span><span class="example">2⁻³ = 1/8</span><span class="note">Обратное число.</span>' },
+      { t: 'Функция y = k/x', e: '<span class="def">Обратная пропорциональность.</span><span class="rule">Гипербола</span><span class="example">y = 6/x</span><span class="note">Ветви в четвертях.</span>' }
+    ],
+    'Геометрия': [
+      { t: 'Параллелограмм', e: '<span class="def">Параллельные стороны.</span><span class="rule">Противоположные равны</span><span class="example">ABCD</span><span class="note">Диагонали делятся пополам.</span>' },
+      { t: 'Ромб', e: '<span class="def">Параллелограмм с равными сторонами.</span><span class="rule">Диагонали ⊥</span><span class="example">Делят углы пополам</span><span class="note">Квадрат — ромб с 90°.</span>' },
+      { t: 'Трапеция', e: '<span class="def">2 параллельные стороны.</span><span class="rule">Средняя линия = полусумма оснований</span><span class="example">S = ½(a+b)h</span><span class="note">Равнобедренная, прямоугольная.</span>' },
+      { t: 'Площади', e: '<span class="def">S фигур.</span><span class="rule">S = ab, ½ah, πR²</span><span class="example">a=3, b=4 → 12</span><span class="note">Квадратные единицы.</span>' },
+      { t: 'Теорема Пифагора', e: '<span class="def">a² + b² = c².</span><span class="rule">c — гипотенуза</span><span class="example">3² + 4² = 5²</span><span class="note">Тройки: 3-4-5, 5-12-13.</span>' }
+    ],
+    'Физика': [
+      { t: 'Тепловые явления', e: '<span class="def">Внутренняя энергия.</span><span class="rule">Q = cmΔt</span><span class="example">вода: c = 4200</span><span class="note">Плавление, пар.</span>' },
+      { t: 'Электричество', e: '<span class="def">Закон Ома.</span><span class="rule">I = U/R</span><span class="example">U=12, R=4 → I=3</span><span class="note">Послед. и паралл.</span>' },
+      { t: 'Магнетизм', e: '<span class="def">Магнитное поле.</span><span class="rule">Правило буравчика</span><span class="example">Компас</span><span class="note">2 полюса.</span>' },
+      { t: 'Световые явления', e: '<span class="def">Отражение, преломление.</span><span class="rule">Закон отражения</span><span class="example">Зеркало</span><span class="note">Линзы.</span>' }
+    ],
+    'Химия': [
+      { t: 'Атомы и молекулы', e: '<span class="def">Атом — мельчайшая частица.</span><span class="rule">Ядро + электроны</span><span class="example">H₂O</span><span class="note">Протонов = электронов.</span>' },
+      { t: 'Периодическая таблица', e: '<span class="def">По возрастанию Z.</span><span class="rule">Группы и периоды</span><span class="example">Na — 11</span><span class="note">Периодичность.</span>' },
+      { t: 'Химические реакции', e: '<span class="def">Реагенты → продукты.</span><span class="rule">Закон сохранения массы</span><span class="example">2H₂ + O₂ → 2H₂O</span><span class="note">Коэффициенты.</span>' },
+      { t: 'Растворы', e: '<span class="def">Однородные смеси.</span><span class="rule">ω = m(в-ва)/m(р-ра)·100%</span><span class="example">10% раствор</span><span class="note">Насыщенные.</span>' }
+    ],
+    'Информатика': [
+      { t: 'Алгоритмы', e: '<span class="def">Последовательность действий.</span><span class="rule">Линейный, ветвление, цикл</span><span class="example">Блок-схема</span><span class="note">Свойства.</span>' },
+      { t: 'Системы счисления', e: '<span class="def">2, 8, 10, 16.</span><span class="rule">10₁₀ = 1010₂</span><span class="example">255 = FF₁₆</span><span class="note">В информатике — двоичная.</span>' },
+      { t: 'Программирование', e: '<span class="def">Переменные, условия, циклы.</span><span class="rule">if, for, while</span><span class="example">print()</span><span class="note">Python — простой.</span>' }
+    ]
+  },
+  '9': {
+    'Алгебра': [
+      { t: 'Квадратичная функция', e: '<span class="def">y = ax² + bx + c.</span><span class="rule">Парабола</span><span class="example">y = x²</span><span class="note">a>0 — вверх.</span>' },
+      { t: 'Прогрессии', e: '<span class="def">Арифм. и геом.</span><span class="rule">aₙ = a₁ + d(n−1)</span><span class="example">2,4,6,8</span><span class="note">Сумма: Sₙ = (a₁+aₙ)n/2.</span>' },
+      { t: 'Статистика', e: '<span class="def">Среднее, медиана, мода.</span><span class="rule">Сумма/количество</span><span class="example">1,2,3 → 2</span><span class="note">Медиана — середина.</span>' },
+      { t: 'Корни n-й степени', e: '<span class="def">ⁿ√a.</span><span class="rule">ⁿ√(ab) = ⁿ√a·ⁿ√b</span><span class="example">³√8 = 2</span><span class="note">Чётная — только из ≥0.</span>' },
+      { t: 'Комбинаторика', e: '<span class="def">Перестановки, сочетания.</span><span class="rule">Pₙ = n!</span><span class="example">3! = 6</span><span class="note">Cₙᵏ = n!/(k!(n−k)!).</span>' }
+    ],
+    'Геометрия': [
+      { t: 'Подобие', e: '<span class="def">Углы равны, стороны пропорциональны.</span><span class="rule">k — коэффициент</span><span class="example">k=2 → S в 4 раза</span><span class="note">Отношение площадей = k².</span>' },
+      { t: 'Векторы', e: '<span class="def">Направленный отрезок.</span><span class="rule">a·b = |a||b|cos α</span><span class="example">Скорость</span><span class="note">Нулевой — длина 0.</span>' },
+      { t: 'Движения', e: '<span class="def">Симметрия, поворот.</span><span class="rule">Сохраняют расстояния</span><span class="example">Зеркало</span><span class="note">Осевая и центральная.</span>' },
+      { t: 'Метод координат', e: '<span class="def">Задачи через координаты.</span><span class="rule">d = √((x₂−x₁)² + (y₂−y₁)²)</span><span class="example">A(0,0), B(3,4) → 5</span><span class="note">Уравнение окружности.</span>' }
+    ],
+    'Физика': [
+      { t: 'Законы Ньютона', e: '<span class="def">3 закона.</span><span class="rule">F = ma</span><span class="example">Толкнул стену</span><span class="note">1-й — инерция.</span>' },
+      { t: 'Импульс', e: '<span class="def">p = mv.</span><span class="rule">Сохраняется</span><span class="example">Столкновение</span><span class="note">Вектор.</span>' },
+      { t: 'Колебания и волны', e: '<span class="def">T и ν.</span><span class="rule">ν = 1/T</span><span class="example">Звук</span><span class="note">Частота в Гц.</span>' },
+      { t: 'Электромагнитное поле', e: '<span class="def">ЭМ волны.</span><span class="rule">c = λν</span><span class="example">Свет</span><span class="note">Спектр.</span>' }
+    ],
+    'Химия': [
+      { t: 'Электролиты', e: '<span class="def">Проводят ток.</span><span class="rule">NaCl → Na⁺ + Cl⁻</span><span class="example">Сильные и слабые</span><span class="note">Соли, кислоты, основания.</span>' },
+      { t: 'Металлы', e: '<span class="def">Свободные электроны.</span><span class="rule">Fe + 2HCl</span><span class="example">Блеск, проводимость</span><span class="note">Активный — цезий.</span>' },
+      { t: 'Неметаллы', e: '<span class="def">Не проводят.</span><span class="rule">S, P, Cl₂</span><span class="example">Реакции с O₂</span><span class="note">Самый активный — фтор.</span>' }
+    ],
+    'Информатика': [
+      { t: 'Моделирование', e: '<span class="def">Упрощённое представление.</span><span class="rule">Материальные и информационные</span><span class="example">Программа</span><span class="note">Главное.</span>' },
+      { t: 'Базы данных', e: '<span class="def">Таблицы, поля, записи.</span><span class="rule">SQL</span><span class="example">SELECT * FROM</span><span class="note">Ключ.</span>' },
+      { t: 'Сети', e: '<span class="def">LAN и WAN.</span><span class="rule">IP, TCP/IP</span><span class="example">192.168.0.1</span><span class="note">IPv4 — 32 бита.</span>' }
+    ],
+    'ОГЭ': [
+      { t: 'Русский язык', e: '<span class="def">3 части.</span><span class="rule">Изложение + тест + сочинение</span><span class="example">9.1, 9.2, 9.3</span><span class="note">Сжатое.</span>' },
+      { t: 'Математика', e: '<span class="def">2 модуля.</span><span class="rule">25 заданий</span><span class="example">3 ч 55 мин</span><span class="note">Пробники.</span>' },
+      { t: 'Обществознание', e: '<span class="def">6 разделов.</span><span class="rule">Человек, общество, экономика, право</span><span class="example">Термины</span><span class="note">Примеры.</span>' }
+    ]
+  },
+  '10': {
+    'Алгебра и начала анализа': [
+      { t: 'Тригонометрия', e: '<span class="def">sin, cos, tg.</span><span class="rule">sin²α + cos²α = 1</span><span class="example">sin 30° = 0.5</span><span class="note">Период 2π.</span>' },
+      { t: 'Производная', e: '<span class="def">Скорость изменения.</span><span class="rule">(xⁿ)\' = n·xⁿ⁻¹</span><span class="example">(x²)\' = 2x</span><span class="note">Константа → 0.</span>' },
+      { t: 'Логарифмы', e: '<span class="def">logₐ b.</span><span class="rule">log(ab) = log a + log b</span><span class="example">log₂ 8 = 3</span><span class="note">logₐ 1 = 0.</span>' },
+      { t: 'Показательная функция', e: '<span class="def">y = aˣ.</span><span class="rule">aˣ·aʸ = aˣ⁺ʸ</span><span class="example">2³ = 8</span><span class="note">Растёт при a>1.</span>' },
+      { t: 'Тригонометрические уравнения', e: '<span class="def">sin x = a.</span><span class="rule">x = (−1)ⁿ arcsin a + πn</span><span class="example">sin x = 0.5</span><span class="note">Период.</span>' }
+    ],
+    'Геометрия': [
+      { t: 'Стереометрия', e: '<span class="def">Фигуры в пространстве.</span><span class="rule">Через 3 точки — плоскость</span><span class="example">3 ножки стула</span><span class="note">Бесконечна.</span>' },
+      { t: 'Многогранники', e: '<span class="def">Призма, пирамида.</span><span class="rule">V = S·h · ⅓S·h</span><span class="example">Куб</span><span class="note">6 граней.</span>' },
+      { t: 'Тела вращения', e: '<span class="def">Цилиндр, конус, шар.</span><span class="rule">V = πR²h · 4/3 πR³</span><span class="example">Стакан</span><span class="note">Шар и сфера.</span>' }
+    ],
+    'Физика': [
+      { t: 'Молекулярная физика', e: '<span class="def">МКТ.</span><span class="rule">p = ⅓·n·m₀·v²</span><span class="example">Давление газа</span><span class="note">−273°C.</span>' },
+      { t: 'Термодинамика', e: '<span class="def">ΔU = Q − A.</span><span class="rule">1-й закон</span><span class="example">Нагревание</span><span class="note">Адиабатный.</span>' },
+      { t: 'Электростатика', e: '<span class="def">Закон Кулона.</span><span class="rule">F = kq₁q₂/r²</span><span class="example">Притяжение</span><span class="note">Одноимённые — отталкиваются.</span>' }
+    ],
+    'Химия': [
+      { t: 'Органическая химия', e: '<span class="def">Соединения C.</span><span class="rule">4 связи</span><span class="example">CH₄</span><span class="note">Гомологи.</span>' },
+      { t: 'Углеводороды', e: '<span class="def">Алканы, алкены, алкины, арены.</span><span class="rule">CₙH₂ₙ₊₂</span><span class="example">C₂H₆</span><span class="note">Метан — газ.</span>' }
+    ],
+    'Информатика': [
+      { t: 'Программирование', e: '<span class="def">Массивы, списки, сортировки.</span><span class="rule">Пузырёк, быстрая</span><span class="example">sorted()</span><span class="note">Стек, очередь.</span>' },
+      { t: 'Алгоритмы', e: '<span class="def">Сложность O(n).</span><span class="rule">O(n), O(log n)</span><span class="example">Бинарный</span><span class="note">Для сортированных.</span>' },
+      { t: 'ЕГЭ подготовка', e: '<span class="def">Все темы.</span><span class="rule">Пробные варианты</span><span class="example">27 задач</span><span class="note">Программирование.</span>' }
+    ]
+  },
+  '11': {
+    'Алгебра и начала анализа': [
+      { t: 'Интегралы', e: '<span class="def">Первообразная.</span><span class="rule">∫xⁿ = xⁿ⁺¹/(n+1) + C</span><span class="example">x²/2 + C</span><span class="note">Площадь.</span>' },
+      { t: 'Показательные уравнения', e: '<span class="def">aˣ = aʸ.</span><span class="rule">x = y</span><span class="example">2ˣ = 8 → x=3</span><span class="note">Логарифмируй.</span>' },
+      { t: 'Комбинаторика', e: '<span class="def">P, C, A.</span><span class="rule">Pₙ = n!</span><span class="example">3! = 6</span><span class="note">0! = 1.</span>' },
+      { t: 'Уравнения с модулем', e: '<span class="def">|x|.</span><span class="rule">|x| = a → x = ±a</span><span class="example">|x−3| = 5</span><span class="note">Два случая.</span>' }
+    ],
+    'Геометрия': [
+      { t: 'Объёмы тел', e: '<span class="def">V фигур.</span><span class="rule">V = abc, S·h, ⅓S·h</span><span class="example">куб 27</span><span class="note">Кубические.</span>' },
+      { t: 'Координаты в пространстве', e: '<span class="def">(x, y, z).</span><span class="rule">d = √((Δx)² + (Δy)² + (Δz)²)</span><span class="example">A(0,0,0), B(3,4,0) → 5</span><span class="note">3 координаты.</span>' },
+      { t: 'Векторы в пространстве', e: '<span class="def">Сложение, скалярное произведение.</span><span class="rule">a·b = |a||b|cos α</span><span class="example">a(1,2,3)</span><span class="note">Число.</span>' }
+    ],
+    'Физика': [
+      { t: 'Оптика', e: '<span class="def">Свет.</span><span class="rule">sin α/sin β = n</span><span class="example">Очки</span><span class="note">c = 3·10⁸ м/с.</span>' },
+      { t: 'Атомная физика', e: '<span class="def">Модель Бора.</span><span class="rule">hν = A + mv²/2</span><span class="example">Солнечные батареи</span><span class="note">h = 6.63·10⁻³⁴.</span>' },
+      { t: 'Квантовая механика', e: '<span class="def">Волна де Бройля.</span><span class="rule">λ = h/p</span><span class="example">Электрон</span><span class="note">Неопределённость.</span>' }
+    ],
+    'Химия': [
+      { t: 'Биоорганические соединения', e: '<span class="def">Белки, жиры, углеводы.</span><span class="rule">Аминокислоты</span><span class="example">C₆H₁₂O₆</span><span class="note">Строительный материал.</span>' },
+      { t: 'Полимеры', e: '<span class="def">Высокомолекулярные.</span><span class="rule">Полимеризация</span><span class="example">Полиэтилен</span><span class="note">Мономер — звено.</span>' }
+    ],
+    'Обществознание': [
+      { t: 'Экономика', e: '<span class="def">Спрос, предложение.</span><span class="rule">Функции денег</span><span class="example">Инфляция</span><span class="note">Рынок.</span>' },
+      { t: 'Право', e: '<span class="def">Отрасли права.</span><span class="rule">Конституция</span><span class="example">Право на образование</span><span class="note">Обязанности.</span>' },
+      { t: 'Политика', e: '<span class="def">Формы правления.</span><span class="rule">Монархия, республика</span><span class="example">РФ — федерация</span><span class="note">Демократия.</span>' }
+    ],
+    'ЕГЭ': [
+      { t: 'Русский язык', e: '<span class="def">27 заданий.</span><span class="rule">Сочинение</span><span class="example">Задание 27</span><span class="note">Читай.</span>' },
+      { t: 'Математика', e: '<span class="def">Профиль: 18, база: 20.</span><span class="rule">Пробники</span><span class="example">Задание 18</span><span class="note">Развёрнутый ответ.</span>' }
+    ]
+  }
+};
+
+// ============ ТЕСТЫ ============
+const tests = {
+  'Математика': [
+    { q: '7 × 8?', opts: ['54','56','64','48'], correct: 1 },
+    { q: '√81?', opts: ['8','9','7','11'], correct: 1 },
+    { q: 'x + 15 = 30 → x?', opts: ['10','15','20','25'], correct: 1 },
+    { q: 'Площадь квадрата со стороной 6?', opts: ['24','30','36','12'], correct: 2 },
+    { q: 'Сумма углов треугольника?', opts: ['90','180','270','360'], correct: 1 },
+    { q: '2⁵?', opts: ['10','16','32','25'], correct: 2 },
+    { q: 'D для x²−5x+6=0?', opts: ['1','4','9','25'], correct: 0 },
+    { q: 'sin 30°?', opts: ['0','0.5','1','0.866'], correct: 1 }
+  ],
+  'Русский язык': [
+    { q: 'Часть речи на «какой?»', opts: ['Сущ.','Прил.','Глагол','Наречие'], correct: 1 },
+    { q: 'Проверка безударной?', opts: ['Запомнить','Однокоренное','Спросить','Наугад'], correct: 1 },
+    { q: 'Синонимы?', opts: ['Противоположные','Близкие','Одинаковые','Разные'], correct: 1 },
+    { q: 'Букв в алфавите?', opts: ['31','32','33','34'], correct: 2 },
+    { q: '«Не» с глаголами?', opts: ['Слитно','Раздельно','Через дефис','По-разному'], correct: 1 }
+  ],
+  'Физика': [
+    { q: 'Скорость?', opts: ['v=S/t','v=S·t','v=t/S','v=S+t'], correct: 0 },
+    { q: 'Сила в?', opts: ['Дж','Н','Вт','Па'], correct: 1 },
+    { q: 'g на Земле?', opts: ['5','9.8','12','3'], correct: 1 },
+    { q: 'Закон Ома?', opts: ['I=U·R','I=U/R','I=R/U','I=U+R'], correct: 1 },
+    { q: 'Работа?', opts: ['A=F·S','A=F/S','A=S/F','A=F+S'], correct: 0 }
+  ],
+  'Химия': [
+    { q: 'Связей у C?', opts: ['1','2','3','4'], correct: 3 },
+    { q: 'Формула воды?', opts: ['CO₂','H₂O','O₂','H₂O₂'], correct: 1 },
+    { q: 'Газ для горения?', opts: ['N','O','H','He'], correct: 1 },
+    { q: 'Моль — это?', opts: ['масса','количество вещества','объём','темп.'], correct: 1 },
+    { q: 'Число Авогадро?', opts: ['6.02·10²³','3.14','9.8','1.6·10⁻¹⁹'], correct: 0 }
+  ],
+  'Информатика': [
+    { q: 'Бит в байте?', opts: ['4','8','16','32'], correct: 1 },
+    { q: '10 в двоичной?', opts: ['1010','1100','1001','1110'], correct: 0 },
+    { q: 'Алгоритм — это?', opts: ['Программа','Последовательность','Компьютер','Файл'], correct: 1 },
+    { q: 'Кб в Мб?', opts: ['100','1000','1024','512'], correct: 2 }
+  ],
+  'История': [
+    { q: 'Крещение Руси?', opts: ['882','988','1054','1147'], correct: 1 },
+    { q: 'Первый князь?', opts: ['Олег','Рюрик','Игорь','Владимир'], correct: 1 },
+    { q: 'Куликовская битва?', opts: ['1240','1380','1480','1552'], correct: 1 },
+    { q: 'Падение Рима?', opts: ['476','395','500','410'], correct: 0 }
+  ],
+  'Биология': [
+    { q: 'Фотосинтез — это?', opts: ['Дыхание','Питание светом','Размножение','Рост'], correct: 1 },
+    { q: 'Камер в сердце?', opts: ['2','3','4','5'], correct: 2 },
+    { q: 'Клетка — это?', opts: ['Ткань','Единица живого','Орган','Организм'], correct: 1 },
+    { q: 'Выделяют растения?', opts: ['CO₂','O₂','N₂','H₂'], correct: 1 }
+  ],
+  'География': [
+    { q: 'Глубочайшее озеро?', opts: ['Байкал','Каспий','Танганьика','Виктория'], correct: 0 },
+    { q: 'Материков?', opts: ['5','6','7','8'], correct: 1 },
+    { q: 'Длиннейшая река?', opts: ['Амазонка','Нил','Янцзы','Миссисипи'], correct: 0 },
+    { q: 'Больший океан?', opts: ['Атлант.','Индийский','Тихий','Сев. Лед.'], correct: 2 }
+  ],
+  'Обществознание': [
+    { q: 'Демократия?', opts: ['Власть одного','Власть народа','Партии','Армии'], correct: 1 },
+    { q: 'Основной закон РФ?', opts: ['УК','Конституция','ГК','ТК'], correct: 1 },
+    { q: 'Инфляция?', opts: ['Рост цен','Падение цен','Рост зарплат','Снижение налогов'], correct: 0 },
+    { q: 'Духовная сфера?', opts: ['Заводы','Наука','Магазины','Банки'], correct: 1 }
+  ]
+};
+
+// ============ ЗАДАЧКИ ============
+const tasks = {
+  'Математика': {
+    'Лёгкий': [
+      { q: 'Сколько будет 15 + 27?', a: '42', sol: '<h5>Решение</h5><p>15 + 27 = 42</p>' },
+      { q: 'Найди 20% от 150.', a: '30', sol: '<h5>Решение</h5><p>20% от 150 = (20 · 150)/100 = 30</p>' },
+      { q: 'Реши: 7x = 56. x = ?', a: '8', sol: '<h5>Решение</h5><p>x = 56/7 = 8</p>' },
+      { q: 'Площадь квадрата со стороной 9?', a: '81', sol: '<h5>Решение</h5><p>S = 9² = 81</p>' },
+      { q: '144 ÷ 12?', a: '12', sol: '<h5>Решение</h5><p>144 ÷ 12 = 12</p>' },
+      { q: '25 · 4?', a: '100', sol: '<h5>Решение</h5><p>25 · 4 = 100</p>' },
+      { q: '50% от 80?', a: '40', sol: '<h5>Решение</h5><p>80/2 = 40</p>' }
+    ],
+    'Средний': [
+      { q: 'x² − 7x + 12 = 0. Сумма корней?', a: '7', sol: '<h5>Решение</h5><p>По Виету: x₁+x₂ = 7</p><p>Корни: 3 и 4</p>' },
+      { q: 'D для 2x² − 5x + 2 = 0?', a: '9', sol: '<h5>Решение</h5><p>D = 25 − 16 = 9</p>' },
+      { q: 'Катеты 6 и 8. Гипотенуза?', a: '10', sol: '<h5>Решение</h5><p>c² = 36 + 64 = 100</p><p>c = 10</p>' },
+      { q: '2⁷?', a: '128', sol: '<h5>Решение</h5><p>2⁷ = 128</p>' },
+      { q: 'sin 60° = √x/2. x?', a: '3', sol: '<h5>Решение</h5><p>x = 3</p>' },
+      { q: 'Площадь круга R=5 (π=3.14)?', a: '78.5', sol: '<h5>Решение</h5><p>3.14 · 25 = 78.5</p>' },
+      { q: '3(x − 2) = 12. x?', a: '6', sol: '<h5>Решение</h5><p>3x = 18, x = 6</p>' }
+    ],
+    'Сложный': [
+      { q: 'Производная 3x⁴ − 2x² + 5 при x=1?', a: '8', sol: '<h5>Решение</h5><p>f\\\'(x) = 12x³ − 4x</p><p>f\\\'(1) = 8</p>' },
+      { q: '∫₀² x dx = ?', a: '2', sol: '<h5>Решение</h5><p>x²/2 от 0 до 2 = 2</p>' },
+      { q: 'Перестановок из 5?', a: '120', sol: '<h5>Решение</h5><p>5! = 120</p>' },
+      { q: 'log₂ 32 = ?', a: '5', sol: '<h5>Решение</h5><p>2⁵ = 32 → log = 5</p>' },
+      { q: 'sin α = 0.6, α в I четв. cos α?', a: '0.8', sol: '<h5>Решение</h5><p>cos²α = 0.64, cos α = 0.8</p>' }
+    ]
+  },
+  'Русский язык': {
+    'Лёгкий': [
+      { q: 'Букв в слове «молоко»?', a: '6', sol: '<h5>Решение</h5><p>6 букв</p>' },
+      { q: 'Гласных в слове «карандаш»?', a: '3', sol: '<h5>Решение</h5><p>а, а, а = 3</p>' },
+      { q: 'Слогов в слове «телефон»?', a: '3', sol: '<h5>Решение</h5><p>те-ле-фон = 3</p>' },
+      { q: 'Букв в русском алфавите?', a: '33', sol: '<h5>Решение</h5><p>33 буквы</p>' }
+    ],
+    'Средний': [
+      { q: 'Часть речи слова «быстро»?', a: 'наречие', sol: '<h5>Решение</h5><p>Как? — наречие</p>' },
+      { q: 'Н в слове «жареный» (отглаг. без приставки)?', a: '1', sol: '<h5>Решение</h5><p>Одна Н</p>' },
+      { q: 'Сколько звуков в «ёлка»?', a: '5', sol: '<h5>Решение</h5><p>ё = [йо], л, к, а → 5</p>' }
+    ],
+    'Сложный': [
+      { q: 'Н в слове «кованый» (без приставки)?', a: '1', sol: '<h5>Решение</h5><p>Одна Н</p>' },
+      { q: '«Солнце село, и стало темно» — простое или сложное?', a: 'сложное', sol: '<h5>Решение</h5><p>Две основы — сложное</p>' },
+      { q: '«Бить баклуши» — что значит?', a: 'бездельничать', sol: '<h5>Решение</h5><p>Бездельничать</p>' }
+    ]
+  },
+  'Физика': {
+    'Лёгкий': [
+      { q: 'Единица силы?', a: 'Н', sol: '<h5>Решение</h5><p>Ньютон (Н)</p>' },
+      { q: 'g на Земле?', a: '9.8', sol: '<h5>Решение</h5><p>9.8 м/с²</p>' },
+      { q: 'Дж в 1 кДж?', a: '1000', sol: '<h5>Решение</h5><p>1000 Дж</p>' }
+    ],
+    'Средний': [
+      { q: '200 км за 4 ч. Скорость (км/ч)?', a: '50', sol: '<h5>Решение</h5><p>v = 200/4 = 50</p>' },
+      { q: 'm = 10 кг. Сила тяжести (Н)?', a: '98', sol: '<h5>Решение</h5><p>F = mg = 98 Н</p>' },
+      { q: 'R = 4 Ом, U = 12 В. I (А)?', a: '3', sol: '<h5>Решение</h5><p>I = U/R = 3 А</p>' },
+      { q: 'F = 20 Н, S = 5 м. A (Дж)?', a: '100', sol: '<h5>Решение</h5><p>A = 100 Дж</p>' }
+    ],
+    'Сложный': [
+      { q: 'Ek для m = 2 кг, v = 10 м/с (Дж)?', a: '100', sol: '<h5>Решение</h5><p>Ek = mv²/2 = 100 Дж</p>' },
+      { q: 'v = 20 м/с вверх. h max (м, g=10)?', a: '20', sol: '<h5>Решение</h5><p>h = v²/2g = 20 м</p>' },
+      { q: 'Давление на глубине 10 м (кПа, g=10)?', a: '100', sol: '<h5>Решение</h5><p>p = ρgh = 100000 Па = 100 кПа</p>' }
+    ]
+  },
+  'Химия': {
+    'Лёгкий': [
+      { q: 'Связей у углерода?', a: '4', sol: '<h5>Решение</h5><p>4</p>' },
+      { q: 'Формула воды?', a: 'H2O', sol: '<h5>Решение</h5><p>H₂O</p>' },
+      { q: 'Атомов H в H₂SO₄?', a: '2', sol: '<h5>Решение</h5><p>2</p>' }
+    ],
+    'Средний': [
+      { q: 'Масса 1 моль воды (M=18)?', a: '18', sol: '<h5>Решение</h5><p>18 г</p>' },
+      { q: 'Объём 1 моль газа при н.у. (л)?', a: '22.4', sol: '<h5>Решение</h5><p>22.4 л</p>' },
+      { q: 'Число Авогадро (X в X·10²³)?', a: '6.02', sol: '<h5>Решение</h5><p>6.02</p>' }
+    ],
+    'Сложный': [
+      { q: 'Масса 2 моль CO₂ (M=44)?', a: '88', sol: '<h5>Решение</h5><p>m = 88 г</p>' },
+      { q: 'Объём 2 моль газа при н.у. (л)?', a: '44.8', sol: '<h5>Решение</h5><p>V = 44.8 л</p>' }
+    ]
+  },
+  'Информатика': {
+    'Лёгкий': [
+      { q: 'Бит в 1 байте?', a: '8', sol: '<h5>Решение</h5><p>8 бит</p>' },
+      { q: 'Байт в 1 Кб?', a: '1024', sol: '<h5>Решение</h5><p>1024</p>' },
+      { q: '10 в двоичной?', a: '1010', sol: '<h5>Решение</h5><p>1010₂</p>' },
+      { q: 'Цветов в 8-битной палитре?', a: '256', sol: '<h5>Решение</h5><p>2⁸ = 256</p>' }
+    ],
+    'Средний': [
+      { q: '255 в 16-ричной?', a: 'FF', sol: '<h5>Решение</h5><p>FF₁₆</p>' },
+      { q: 'Бит в 4 Кб?', a: '32768', sol: '<h5>Решение</h5><p>4 · 1024 · 8 = 32768</p>' },
+      { q: 'Объём 1 символа из 16 знаков (бит)?', a: '4', sol: '<h5>Решение</h5><p>16 = 2⁴ → 4 бита</p>' }
+    ],
+    'Сложный': [
+      { q: '1111₂ в десятичной?', a: '15', sol: '<h5>Решение</h5><p>8+4+2+1 = 15</p>' },
+      { q: 'Перестановок из 4?', a: '24', sol: '<h5>Решение</h5><p>4! = 24</p>' }
+    ]
+  },
+  'История': {
+    'Лёгкий': [
+      { q: 'Год Крещения Руси?', a: '988', sol: '<h5>Решение</h5><p>988</p>' },
+      { q: 'Первый князь Руси?', a: 'Рюрик', sol: '<h5>Решение</h5><p>Рюрик</p>' },
+      { q: 'Год падения Рима?', a: '476', sol: '<h5>Решение</h5><p>476</p>' }
+    ],
+    'Средний': [
+      { q: 'Кто объединил Новгород и Киев?', a: 'Олег', sol: '<h5>Решение</h5><p>Олег, 882</p>' },
+      { q: 'Год отмены крепостного права?', a: '1861', sol: '<h5>Решение</h5><p>1861</p>' },
+      { q: 'Год начала ВОВ?', a: '1941', sol: '<h5>Решение</h5><p>1941</p>' }
+    ],
+    'Сложный': [
+      { q: 'Год образования империи?', a: '1721', sol: '<h5>Решение</h5><p>1721</p>' },
+      { q: 'Год Октябрьской революции?', a: '1917', sol: '<h5>Решение</h5><p>1917</p>' },
+      { q: 'Год распада СССР?', a: '1991', sol: '<h5>Решение</h5><p>1991</p>' }
+    ]
+  },
+  'Биология': {
+    'Лёгкий': [
+      { q: 'Камер в сердце?', a: '4', sol: '<h5>Решение</h5><p>4</p>' },
+      { q: 'Хромосом у человека?', a: '46', sol: '<h5>Решение</h5><p>46</p>' },
+      { q: 'Газ при фотосинтезе?', a: 'O2', sol: '<h5>Решение</h5><p>O₂</p>' }
+    ],
+    'Средний': [
+      { q: 'Костей у взрослого?', a: '206', sol: '<h5>Решение</h5><p>206</p>' },
+      { q: 'Групп крови по AB0?', a: '4', sol: '<h5>Решение</h5><p>4</p>' },
+      { q: 'Пигмент растений?', a: 'хлорофилл', sol: '<h5>Решение</h5><p>Хлорофилл</p>' }
+    ],
+    'Сложный': [
+      { q: 'Нуклеотидов на аминокислоту?', a: '3', sol: '<h5>Решение</h5><p>3 (триплет)</p>' },
+      { q: 'Типов нуклеотидов в ДНК?', a: '4', sol: '<h5>Решение</h5><p>4</p>' }
+    ]
+  },
+  'География': {
+    'Лёгкий': [
+      { q: 'Глубочайшее озеро?', a: 'Байкал', sol: '<h5>Решение</h5><p>Байкал</p>' },
+      { q: 'Материков?', a: '6', sol: '<h5>Решение</h5><p>6</p>' },
+      { q: 'Самый большой океан?', a: 'Тихий', sol: '<h5>Решение</h5><p>Тихий</p>' }
+    ],
+    'Средний': [
+      { q: 'Столица Австралии?', a: 'Канберра', sol: '<h5>Решение</h5><p>Канберра</p>' },
+      { q: 'Самый большой материк?', a: 'Евразия', sol: '<h5>Решение</h5><p>Евразия</p>' },
+      { q: 'Океанов на Земле?', a: '5', sol: '<h5>Решение</h5><p>5</p>' }
+    ],
+    'Сложный': [
+      { q: 'Самая высокая гора?', a: 'Эверест', sol: '<h5>Решение</h5><p>Эверест</p>' },
+      { q: 'Длиннейшая река Европы?', a: 'Волга', sol: '<h5>Решение</h5><p>Волга</p>' }
+    ]
+  },
+  'Обществознание': {
+    'Лёгкий': [
+      { q: 'Основной закон РФ?', a: 'Конституция', sol: '<h5>Решение</h5><p>Конституция</p>' },
+      { q: 'Возраст работы с согласия родителей?', a: '14', sol: '<h5>Решение</h5><p>14</p>' },
+      { q: 'Возраст полной дееспособности?', a: '18', sol: '<h5>Решение</h5><p>18</p>' }
+    ],
+    'Средний': [
+      { q: 'Инфляция — рост или падение цен?', a: 'рост', sol: '<h5>Решение</h5><p>Рост</p>' },
+      { q: 'Ветвей власти в РФ?', a: '3', sol: '<h5>Решение</h5><p>3</p>' },
+      { q: 'Наука — духовная сфера? (да/нет)', a: 'да', sol: '<h5>Решение</h5><p>Да</p>' }
+    ],
+    'Сложный': [
+      { q: 'Год принятия Конституции РФ?', a: '1993', sol: '<h5>Решение</h5><p>1993</p>' },
+      { q: 'Субъектов в РФ?', a: '89', sol: '<h5>Решение</h5><p>89</p>' }
+    ]
+  }
+};
+
+// ============ ФАКТЫ ============
+const facts = {
+  'Математика': ['π бесконечно и не повторяется.','0.999... = 1.','Простых чисел бесконечно много.','1729 — сумма кубов двумя способами.','√2 — иррациональное.'],
+  'Русский язык': ['33 буквы, но 42 звука.','Самое длинное слово — «достопримечательность».','200 000+ слов в русском.','«Победить» нельзя в 1-м лице.','Буква «ё» появилась в 1783.'],
+  'Физика': ['Скорость света 299 792 458 м/с.','Молния в 5 раз горячее Солнца.','Эйфелева башня летом выше на 15 см.','Звук в воде в 4 раза быстрее.','В невесомости свеча тусклее.'],
+  'Химия': ['Золото — ковкий металл.','Алмаз и графит — формы углерода.','Вода расширяется при замерзании.','Гелий не замерзает.','Фтор — активный неметалл.'],
+  'Информатика': ['Первая мышь была деревянной.','Первая программа — 1843, Ада Лавлейс.','1 Тб = 1024 Гб.','Первый домен — symbolics.com (1985).','1.5+ млрд сайтов.'],
+  'История': ['Самая короткая война — 38 минут.','Клеопатра ближе к iPhone, чем к пирамидам.','Наполеон — 168 см.','Оксфорд старше Ацтеков.','Китайская стена видна из космоса при условиях.'],
+  'Биология': ['У осьминога 3 сердца.','Сердце кита — с автомобиль.','25 000 зубов у улитки.','Муравей поднимает 50× своего веса.','ДНК человека на 60% как у банана.'],
+  'География': ['Байкал — 1642 м.','Антарктида — пустыня.','Африка — больше всех стран.','Тихий океан больше всей суши.','Амазонка — длиннейшая.'],
+  'Обществознание': ['190+ народов в РФ.','Конституция РФ — 12.12.1993.','Работа с 14 лет с согласия.','Самый молодой депутат — 18 лет.','190+ государств.']
+};
+
+// ============ ПРЕДМЕТЫ ============
+let currentGrade = '5';
+let currentSubject = null;
+let learned = JSON.parse(localStorage.getItem('alisa_learned') || '{}');
+
+const subjectIcons = { 'Математика':'📐','Алгебра':'📐','Алгебра и начала анализа':'📐','Геометрия':'📏','Русский язык':'📖','История':'🏛️','Биология':'🧬','География':'🌍','Физика':'⚛️','Химия':'🧪','Информатика':'💻','ОГЭ':'📝','ЕГЭ':'🎓','Обществознание':'⚖️' };
+
+function updateStats() {
+  let total = 0; const subs = new Set();
+  Object.values(data).forEach(g => { Object.keys(g).forEach(s => subs.add(s)); Object.values(g).forEach(t => total += t.length); });
+  document.getElementById('statTopics').textContent = total;
+  document.getElementById('statLearned').textContent = Object.keys(learned).length;
+  document.getElementById('statTests').textContent = Object.keys(tests).length;
+  document.getElementById('statSubjects').textContent = subs.size;
+}
+
+function renderGrades() {
+  const wrap = document.getElementById('gradeButtons');
+  wrap.innerHTML = Object.keys(data).map(g => `<button class="grade-btn" onclick="showGrade('${g}', this)">${g} класс</button>`).join('');
+  showGrade('5', wrap.firstChild);
+}
+
+function showGrade(g, btn) {
+  currentGrade = g; currentSubject = null;
+  document.querySelectorAll('#gradeButtons .grade-btn').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  document.getElementById('aiAssistant').classList.remove('show');
+  renderSubjects();
+  document.getElementById('topicsWrap').innerHTML = '';
+  document.getElementById('topicSearch').value = '';
+  document.getElementById('searchResults').innerHTML = '';
+  document.getElementById('searchResults').style.display = 'none';
+  document.getElementById('topicsWrap').style.display = 'grid';
+  document.getElementById('subjectsRow').style.display = 'grid';
+}
+
+function renderSubjects() {
+  const wrap = document.getElementById('subjectsRow');
+  const subs = Object.keys(data[currentGrade]);
+  wrap.innerHTML = subs.map(s => {
+    const topics = data[currentGrade][s];
+    const learnedCount = topics.filter(t => learned[currentGrade + '|' + s + '|' + t.t]).length;
+    const percent = Math.round(learnedCount / topics.length * 100);
+    return `<div class="subject-card" data-subject="${s}"><span class="s-icon">${subjectIcons[s] || '📚'}</span><h4>${s}</h4><span>${topics.length} тем · ${learnedCount} изучено</span><div class="mini-progress"><div class="mini-progress-fill" style="width:${percent}%"></div></div></div>`;
+  }).join('');
+  wrap.querySelectorAll('.subject-card').forEach(card => card.addEventListener('click', () => selectSubject(card.dataset.subject, card)));
+}
+
+function selectSubject(s, el) {
+  currentSubject = s;
+  document.querySelectorAll('.subject-card').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('aiAssistant').classList.add('show');
+  renderTopics();
+  beep(700, 0.05);
+}
+
+function renderTopics(filter = '') {
+  if (!currentSubject) return;
+  const wrap = document.getElementById('topicsWrap');
+  const topics = data[currentGrade][currentSubject];
+  const filtered = filter ? topics.filter(t => t.t.toLowerCase().includes(filter.toLowerCase()) || stripHtml(t.e).toLowerCase().includes(filter.toLowerCase())) : topics;
+  if (filtered.length === 0) { wrap.innerHTML = '<p style="color:var(--muted); text-align:center; grid-column:1/-1;">Ничего не найдено</p>'; return; }
+  wrap.innerHTML = '';
+  filtered.forEach(t => {
+    const key = currentGrade + '|' + currentSubject + '|' + t.t;
+    const isLearned = learned[key];
+    const topic = document.createElement('div');
+    topic.className = 'topic' + (isLearned ? ' learned' : '');
+    const h4 = document.createElement('h4'); h4.textContent = t.t;
+    const actions = document.createElement('div'); actions.className = 'topic-actions';
+    const explainBtn = document.createElement('button'); explainBtn.className = 'explain-btn'; explainBtn.textContent = 'Объяснить';
+    explainBtn.addEventListener('click', () => {
+      const text = topic.querySelector('.explain-text:not(.material-text)');
+      if (text.classList.contains('open')) { text.classList.remove('open'); explainBtn.textContent = 'Объяснить'; }
+      else { text.classList.add('open'); explainBtn.textContent = 'Скрыть'; }
+      beep(600, 0.05);
+    });
+    const aiBtn = document.createElement('button'); aiBtn.className = 'ai-btn'; aiBtn.textContent = '🤖 AI объяснить';
+    const aiBox = document.createElement('div'); aiBox.className = 'ai-response'; aiBox.style.display = 'none';
+    aiBtn.addEventListener('click', () => {
+      if (aiBox.style.display === 'block' && !aiBox.querySelector('.ai-loading')) {
+        aiBox.style.display = 'none';
+      } else {
+        explainWithAI(currentGrade, currentSubject, t.t, aiBtn, aiBox);
+      }
+    });
+    const learnBtn = document.createElement('button'); learnBtn.className = 'learn-btn'; learnBtn.textContent = isLearned ? 'Изучено' : 'Отметить';
+    learnBtn.addEventListener('click', () => {
+      if (learned[key]) { delete learned[key]; topic.classList.remove('learned'); learnBtn.textContent = 'Отметить'; beep(400, 0.1); }
+      else { learned[key] = true; topic.classList.add('learned'); learnBtn.textContent = 'Изучено'; beep(900, 0.1); }
+      localStorage.setItem('alisa_learned', JSON.stringify(learned));
+      updateStats();
+      const activeSub = currentSubject;
+      renderSubjects();
+      document.querySelectorAll('.subject-card').forEach(c => { if (c.dataset.subject === activeSub) c.classList.add('active'); });
+    });
+    actions.appendChild(explainBtn); actions.appendChild(aiBtn); actions.appendChild(learnBtn);
+    topic.appendChild(h4); topic.appendChild(actions);
+    const explainText = document.createElement('div'); explainText.className = 'explain-text'; explainText.innerHTML = t.e;
+    topic.appendChild(explainText);
+    topic.appendChild(aiBox);
+    wrap.appendChild(topic);
+  });
+}
+
+function filterTopics() { globalSearch(); }
+
+function globalSearch() {
+  const q = document.getElementById('topicSearch').value.trim().toLowerCase();
+  const results = document.getElementById('searchResults');
+  const normal = document.getElementById('topicsWrap');
+  const subjectsRow = document.getElementById('subjectsRow');
+  const gradesBlock = document.getElementById('gradeButtons');
+  const aiAssistant = document.getElementById('aiAssistant');
+  if (!q) { results.innerHTML = ''; results.style.display = 'none'; normal.style.display = 'grid'; subjectsRow.style.display = 'grid'; gradesBlock.style.display = 'flex'; if (currentSubject) aiAssistant.classList.add('show'); return; }
+  results.style.display = 'grid'; normal.style.display = 'none'; subjectsRow.style.display = 'none'; gradesBlock.style.display = 'none'; aiAssistant.classList.remove('show');
+  const found = [];
+  Object.keys(data).forEach(grade => {
+    Object.keys(data[grade]).forEach(subject => {
+      data[grade][subject].forEach(topic => {
+        const inTitle = topic.t.toLowerCase().includes(q);
+        const inExplain = stripHtml(topic.e).toLowerCase().includes(q);
+        if (inTitle || inExplain) found.push({ grade, subject, topic, matchType: inTitle ? 'название' : 'объяснение' });
+      });
+    });
+  });
+  if (found.length === 0) { results.innerHTML = '<p style="color:var(--muted); text-align:center; grid-column:1/-1;">Ничего не найдено</p>'; return; }
+  const grouped = {};
+  found.forEach(f => { const key = f.grade + '|' + f.subject; if (!grouped[key]) grouped[key] = { grade: f.grade, subject: f.subject, items: [] }; grouped[key].items.push(f); });
+  let html = '';
+  Object.values(grouped).forEach(g => {
+    html += `<div style="grid-column:1/-1; margin-top:8px;"><div style="font-size:0.85rem; color:var(--accent-3); margin-bottom:10px;">${g.grade} класс · ${g.subject} · найдено: ${g.items.length}</div></div>`;
+    g.items.forEach(f => {
+      const key = f.grade + '|' + f.subject + '|' + f.topic.t;
+      html += `<div class="topic" data-key="${key}" data-grade="${f.grade}" data-subject="${f.subject}"><h4>${f.topic.t}</h4><div style="font-size:0.75rem; color:var(--muted); margin-bottom:8px;">совпадение в: ${f.matchType}</div><div class="topic-actions"><button class="explain-btn" data-action="explain">Объяснить</button><button class="explain-btn" data-action="goto" style="border-color:rgba(255,95,162,0.5); color:var(--accent-1);">Перейти</button></div><div class="explain-text">${f.topic.e}</div></div>`;
+    });
+  });
+  results.innerHTML = html;
+  results.querySelectorAll('.topic').forEach(topicEl => {
+    const grade = topicEl.dataset.grade; const subject = topicEl.dataset.subject;
+    topicEl.querySelectorAll('button[data-action]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const action = btn.dataset.action;
+        if (action === 'explain') {
+          const t = topicEl.querySelector('.explain-text');
+          if (t.classList.contains('open')) { t.classList.remove('open'); btn.textContent = 'Объяснить'; }
+          else { t.classList.add('open'); btn.textContent = 'Скрыть'; }
+        } else if (action === 'goto') {
+          currentGrade = grade; currentSubject = subject;
+          document.getElementById('topicSearch').value = '';
+          results.innerHTML = ''; results.style.display = 'none';
+          normal.style.display = 'grid'; subjectsRow.style.display = 'grid'; gradesBlock.style.display = 'flex';
+          document.querySelectorAll('#gradeButtons .grade-btn').forEach(b => b.classList.toggle('active', b.textContent.startsWith(grade)));
+          renderSubjects();
+          setTimeout(() => { document.querySelectorAll('.subject-card').forEach(c => { if (c.dataset.subject === subject) { c.classList.add('active'); selectSubject(subject, c); } }); }, 50);
+        }
+      });
+    });
+  });
+}
+
+renderGrades();
+updateStats();
+
+// ============ ТЕСТЫ ============
+let testState = null;
+
+function renderTestSubjects() {
+  const wrap = document.getElementById('testSubjectsRow');
+  const subs = Object.keys(tests);
+  wrap.innerHTML = subs.map(s => `<button class="grade-btn" onclick="startTest('${s}', this)">${subjectIcons[s] || '📝'} ${s}</button>`).join('');
+  wrap.firstChild.classList.add('active');
+  startTest(subs[0], wrap.firstChild);
+}
+
+function startTest(subject, btn) {
+  if (btn) { document.querySelectorAll('#testSubjectsRow .grade-btn').forEach(b => b.classList.remove('active')); btn.classList.add('active'); }
+  testState = { subject, idx: 0, score: 0, questions: tests[subject], wrongList: [] };
+  renderTestQuestion();
+}
+
+function renderTestQuestion() {
+  const wrap = document.getElementById('testWrap');
+  const s = testState;
+  if (s.idx >= s.questions.length) { renderTestResult(); return; }
+  const q = s.questions[s.idx];
+  const progress = Math.round(s.idx / s.questions.length * 100);
+  wrap.innerHTML = `<div class="test-header"><span class="test-counter">${s.subject} · Вопрос ${s.idx + 1} из ${s.questions.length}</span><div class="test-progress"><div class="test-progress-fill" style="width:${progress}%"></div></div></div><div class="test-question">${q.q}</div><div class="test-options">${q.opts.map((o, i) => `<button class="test-opt" onclick="answerTest(${i})">${o}</button>`).join('')}</div>`;
+}
+
+function answerTest(idx) {
+  const s = testState;
+  const q = s.questions[s.idx];
+  const opts = document.querySelectorAll('.test-opt');
+  opts.forEach(o => o.disabled = true);
+  if (idx === q.correct) {
+    s.score++;
+    opts[idx].classList.add('correct');
+    opts[idx].textContent = q.opts[idx] + '   ' + getPraise();
+    beep(900, 0.1);
+  } else {
+    opts[idx].classList.add('wrong');
+    opts[q.correct].classList.add('correct');
+    s.wrongList.push({ q: q.q, correct: q.opts[q.correct], user: q.opts[idx] });
+    beep(300, 0.15);
+  }
+  setTimeout(() => { s.idx++; renderTestQuestion(); }, 1100);
+}
+
+function renderTestResult() {
+  const wrap = document.getElementById('testWrap');
+  const s = testState;
+  const percent = Math.round(s.score / s.questions.length * 100);
+  let msg = percent === 100 ? 'Идеально!' : percent >= 80 ? 'Отличный результат!' : percent >= 60 ? 'Хорошо!' : percent >= 40 ? 'Стоит повторить.' : 'Начни с основ.';
+  let wrongBlock = '';
+  if (s.wrongList.length) {
+    wrongBlock = `<div style="margin-top:24px; text-align:left;"><h3 style="color:var(--accent-3); margin-bottom:12px; font-size:1rem;">Разбор ошибок</h3>${s.wrongList.map(w => `<div style="background:var(--card); border-left:3px solid var(--accent-1); padding:12px 16px; border-radius:8px; margin-bottom:10px;"><div style="font-size:0.9rem; margin-bottom:6px;">${w.q}</div><div style="font-size:0.82rem; color:var(--muted);">Твой ответ: <span style="color:var(--accent-1);">${w.user}</span> · Правильно: <span style="color:#34d399;">${w.correct}</span></div></div>`).join('')}</div>`;
+  }
+  wrap.innerHTML = `<div class="test-result"><div class="score">${percent}%</div><div class="msg">${msg}</div><div style="color:var(--muted); margin-bottom:18px;">Правильных: ${s.score} из ${s.questions.length}</div><button class="btn" onclick="startTest('${s.subject}')">Пройти снова</button></div>${wrongBlock}`;
+  beep(percent >= 60 ? 900 : 400, 0.2);
+}
+
+renderTestSubjects();
+
+// ============ ЗАДАЧКИ ============
+let currentTaskSubject = 'Математика';
+let currentTaskLevel = 'Лёгкий';
+let currentTaskIdx = 0;
+let currentTaskList = [];
+let taskScore = 0;
+
+function renderTaskSubjects() {
+  const wrap = document.getElementById('taskSubjectsRow');
+  wrap.innerHTML = Object.keys(tasks).map(s => `<button class="grade-btn" onclick="setTaskSubject('${s}', this)">${subjectIcons[s] || '📝'} ${s}</button>`).join('');
+  wrap.firstChild.classList.add('active');
+  setTaskSubject('Математика', wrap.firstChild);
+}
+
+function setTaskSubject(s, btn) {
+  currentTaskSubject = s;
+  document.querySelectorAll('#taskSubjectsRow .grade-btn').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  renderTaskLevels();
+}
+
+function renderTaskLevels() {
+  const wrap = document.getElementById('taskLevelsRow');
+  const levels = Object.keys(tasks[currentTaskSubject]);
+  wrap.innerHTML = levels.map(l => `<button class="btn-sm" onclick="setTaskLevel('${l}', this)">${l}</button>`).join('');
+  if (levels.length) { wrap.firstChild.classList.add('active'); setTaskLevel(levels[0], wrap.firstChild); }
+}
+
+function setTaskLevel(l, btn) {
+  currentTaskLevel = l;
+  document.querySelectorAll('#taskLevelsRow .btn-sm').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  currentTaskList = tasks[currentTaskSubject][l];
+  currentTaskIdx = 0;
+  taskScore = 0;
+  renderTask();
+}
+
+function renderTask() {
+  const wrap = document.getElementById('taskWrap');
+  if (currentTaskIdx >= currentTaskList.length) {
+    wrap.innerHTML = `<div class="task-card" style="text-align:center;"><div style="font-size:2.5rem;">🎉</div><h3 style="margin:12px 0;">Все задачи решены!</h3><p style="color:var(--muted); margin-bottom:20px;">Правильно: ${taskScore} из ${currentTaskList.length}</p><button class="btn" onclick="setTaskLevel('${currentTaskLevel}')">Пройти снова</button></div>`;
+    return;
+  }
+  const t = currentTaskList[currentTaskIdx];
+  wrap.innerHTML = `<div class="task-counter">Задача ${currentTaskIdx + 1} из ${currentTaskList.length} · Правильно: ${taskScore}</div><div class="task-card"><div class="task-question">${t.q}</div><div class="task-input-row"><input type="text" class="task-input" id="taskAnswer" placeholder="Твой ответ" onkeydown="if(event.key==='Enter')checkTask()"><button class="btn" onclick="checkTask()">Проверить</button></div><div class="task-actions"><button class="btn-sm" onclick="showTaskSolution()">Показать решение</button><button class="btn-sm" onclick="skipTask()">Пропустить</button></div><div class="task-feedback" id="taskFeedback"></div><div class="task-solution" id="taskSolution">${t.sol}</div></div>`;
+  document.getElementById('taskAnswer').focus();
+}
+
+function normalize(s) { return String(s).trim().toLowerCase().replace(/,/g, '.').replace(/\s+/g, ''); }
+
+function checkTask() {
+  const ans = document.getElementById('taskAnswer').value;
+  const t = currentTaskList[currentTaskIdx];
+  const fb = document.getElementById('taskFeedback');
+  const correct = normalize(ans) === normalize(t.a);
+  if (correct) {
+    taskScore++;
+    fb.textContent = getPraise();
+    fb.className = 'task-feedback ok show';
+    beep(900, 0.1);
+    setTimeout(() => { currentTaskIdx++; renderTask(); }, 1200);
+  } else {
+    fb.textContent = 'Неверно. Попробуй ещё или посмотри решение.';
+    fb.className = 'task-feedback no show';
+    beep(300, 0.15);
+  }
+}
+
+function showTaskSolution() {
+  document.getElementById('taskSolution').classList.add('show');
+}
+
+function skipTask() {
+  currentTaskIdx++;
+  renderTask();
+}
+
+renderTaskSubjects();
+
+// ============ КАЛЬКУЛЯТОР ============
+function switchCalc(name, btn) {
+  document.querySelectorAll('.calc-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('calc-' + name).classList.add('active');
+  document.querySelectorAll('.calc-tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+let calcExpr = '';
+const basicBtns = ['C','⌫','%','/','7','8','9','*','4','5','6','-','1','2','3','+','0','.','=','='];
+
+function renderCalc() {
+  const grid = document.getElementById('calcGrid');
+  grid.innerHTML = basicBtns.map(b => {
+    let cls = 'calc-btn';
+    if (['/','*','-','+','%'].includes(b)) cls += ' op';
+    if (b === '=') cls += ' eq';
+    if (b === 'C') cls += ' clear';
+    return `<button class="${cls}" onclick="calcPress('${b}')">${b}</button>`;
+  }).join('');
+}
+
+function calcPress(b) {
+  const display = document.getElementById('calcDisplay');
+  const history = document.getElementById('calcHistory');
+  beep(500, 0.03);
+  if (b === 'C') { calcExpr=''; display.textContent='0'; history.textContent=''; return; }
+  if (b === '⌫') { calcExpr=calcExpr.slice(0,-1); display.textContent=calcExpr||'0'; return; }
+  if (b === '=') {
+    try {
+      const result = Function('"use strict";return (' + calcExpr + ')')();
+      history.textContent = calcExpr + ' =';
+      display.textContent = result;
+      calcExpr = String(result);
+      beep(900, 0.1);
+    } catch(e) { display.textContent='Ошибка'; calcExpr=''; beep(300, 0.15); }
+    return;
+  }
+  calcExpr += b;
+  display.textContent = calcExpr;
+}
+renderCalc();
+
+function gcd(a, b) { return b ? gcd(b, a % b) : Math.abs(a); }
+
+function calcFrac() {
+  const n1 = parseInt(document.getElementById('f1n').value);
+  const d1 = parseInt(document.getElementById('f1d').value);
+  const n2 = parseInt(document.getElementById('f2n').value);
+  const d2 = parseInt(document.getElementById('f2d').value);
+  const op = document.getElementById('fracOp').value;
+  const out = document.getElementById('fracOut');
+  if (!d1 || !d2) { out.textContent = 'Знаменатель ≠ 0'; return; }
+  let n, d;
+  if (op === '+') { n = n1*d2 + n2*d1; d = d1*d2; }
+  else if (op === '-') { n = n1*d2 - n2*d1; d = d1*d2; }
+  else if (op === '*') { n = n1*n2; d = d1*d2; }
+  else { n = n1*d2; d = d1*n2; }
+  if (d < 0) { n = -n; d = -d; }
+  const g = gcd(n, d);
+  out.textContent = `Результат: ${n/g}/${d/g}\nДесятичное: ${((n/g)/(d/g)).toFixed(4).replace(/\.?0+$/, '')}`;
+  beep(900, 0.1);
+}
+
+function columnMul() {
+  const a = parseInt(document.getElementById('mulA').value);
+  const b = parseInt(document.getElementById('mulB').value);
+  const out = document.getElementById('mulOut');
+  if (isNaN(a) || isNaN(b)) { out.textContent = 'Введи два числа'; return; }
+  const sb = String(Math.abs(b));
+  const width = Math.max(String(Math.abs(a)).length, sb.length, String(a*b).length);
+  const lines = [String(a).padStart(width, ' '), '× ' + String(b).padStart(width - 2, ' '), '─'.repeat(width)];
+  const bDigits = sb.split('').reverse();
+  for (let i = 0; i < bDigits.length; i++) {
+    lines.push(String(Math.abs(a) * parseInt(bDigits[i])).padStart(width - i, ' ') + ' '.repeat(i));
+  }
+  if (bDigits.length > 1) { lines.push('─'.repeat(width)); lines.push(String(a*b).padStart(width, ' ')); }
+  out.textContent = lines.join('\n');
+  beep(900, 0.1);
+}
+
+function columnDiv() {
+  const a = parseInt(document.getElementById('divA').value);
+  const b = parseInt(document.getElementById('divB').value);
+  const out = document.getElementById('divOut');
+  if (isNaN(a) || isNaN(b) || b === 0) { out.textContent = 'Делитель ≠ 0'; return; }
+  const q = Math.trunc(a / b);
+  const r = a - q * b;
+  let res = `${a} ÷ ${b} = ${q}`;
+  if (r) res += ` (ост. ${r})`;
+  res += '\n\nПроверка: ' + q + ' × ' + b + (r ? ' + ' + r : '') + ' = ' + a;
+  out.textContent = res;
+  beep(900, 0.1);
+}
+
+function calcDisc() {
+  const a = parseFloat(document.getElementById('dA').value);
+  const b = parseFloat(document.getElementById('dB').value);
+  const c = parseFloat(document.getElementById('dC').value);
+  const out = document.getElementById('discOut');
+  if (a === 0) { out.textContent = 'a ≠ 0'; return; }
+  const D = b*b - 4*a*c;
+  let res = `${a}x² + ${b}x + ${c} = 0\nD = ${b}² − 4·${a}·${c} = ${D}\n\n`;
+  if (D > 0) {
+    const x1 = (-b + Math.sqrt(D)) / (2*a);
+    const x2 = (-b - Math.sqrt(D)) / (2*a);
+    res += `D > 0 — два корня:\nx₁ = ${x1.toFixed(4).replace(/\.?0+$/, '')}\nx₂ = ${x2.toFixed(4).replace(/\.?0+$/, '')}`;
+  } else if (D === 0) {
+    res += `D = 0 — один корень:\nx = ${(-b/(2*a)).toFixed(4).replace(/\.?0+$/, '')}`;
+  } else {
+    res += 'D < 0 — корней нет';
+  }
+  out.textContent = res;
+  beep(900, 0.1);
+}
+
+// ============ ФАКТЫ ============
+let currentFactSubject = 'Математика';
+
+function renderFactSubjects() {
+  const wrap = document.getElementById('factSubjects');
+  wrap.innerHTML = Object.keys(facts).map(s => `<button class="btn-sm" onclick="setFactSubject('${s}', this)">${s}</button>`).join('');
+  wrap.firstChild.classList.add('active');
+}
+
+function setFactSubject(s, btn) {
+  currentFactSubject = s;
+  document.querySelectorAll('#factSubjects .btn-sm').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('factText').textContent = 'Нажми «Новый факт».';
+}
+
+function newFact() {
+  const arr = facts[currentFactSubject];
+  const box = document.getElementById('factText');
+  box.style.opacity = 0;
+  beep(700, 0.05);
+  setTimeout(() => {
+    box.textContent = arr[Math.floor(Math.random() * arr.length)];
+    box.style.transition = 'opacity 0.4s';
+    box.style.opacity = 1;
+  }, 150);
+}
+renderFactSubjects();
+
+// ============ УМНОЖЕНИЕ ============
+let multA = 7, multB = 8, multScore = 0, multWrong = 0, multMax = 10;
+
+function setMultLevel(level, btn) {
+  multMax = level === 1 ? 5 : level === 2 ? 10 : level === 3 ? 20 : 50;
+  document.querySelectorAll('#tool-mult .btn-sm').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  newMult();
+}
+
+function newMult() {
+  multA = Math.floor(Math.random() * (multMax - 1)) + 2;
+  multB = Math.floor(Math.random() * (multMax - 1)) + 2;
+  document.getElementById('multQ').textContent = multA + ' × ' + multB;
+  document.getElementById('multAnswer').value = '';
+  document.getElementById('multStatus').textContent = '';
+}
+
+function checkMult() {
+  const val = parseInt(document.getElementById('multAnswer').value);
+  const status = document.getElementById('multStatus');
+  if (isNaN(val)) return;
+  if (val === multA * multB) {
+    multScore++;
+    status.textContent = getPraise();
+    status.className = 'mult-status ok';
+    document.getElementById('multScore').textContent = multScore;
+    beep(900, 0.1);
+    setTimeout(newMult, 800);
+  } else {
+    multWrong++;
+    status.textContent = 'Неверно. Правильно: ' + (multA * multB);
+    status.className = 'mult-status no';
+    document.getElementById('multWrong').textContent = multWrong;
+    beep(300, 0.15);
+  }
+}
+document.getElementById('multAnswer').addEventListener('keydown', e => { if (e.key === 'Enter') checkMult(); });
+
+// ============ СИСТЕМЫ СЧИСЛЕНИЯ ============
+function updateNums() {
+  const raw = document.getElementById('numInput').value.trim();
+  const out = document.getElementById('numOut');
+  if (!raw) { out.textContent = 'Введи число'; return; }
+  let n = NaN;
+  if (/^[01]+b$/i.test(raw)) n = parseInt(raw.slice(0, -1), 2);
+  else if (/^[0-7]+o$/i.test(raw)) n = parseInt(raw.slice(0, -1), 8);
+  else if (/^[0-9a-f]+h$/i.test(raw)) n = parseInt(raw.slice(0, -1), 16);
+  else n = parseInt(raw, 10);
+  if (isNaN(n)) { out.textContent = 'Не удалось распознать'; return; }
+  out.innerHTML = 'Десятичная: <b>' + n + '</b><br>Двоичная: <b>' + n.toString(2) + '</b><br>Восьмеричная: <b>' + n.toString(8) + '</b><br>Шестнадцатеричная: <b>' + n.toString(16).toUpperCase() + '</b>';
+}
+document.getElementById('numInput').addEventListener('input', updateNums);
+updateNums();
+
+// ============ КОНВЕРТЕР ============
+function updateConv() {
+  const val = parseFloat(document.getElementById('convInput').value);
+  const pair = document.getElementById('convFrom').value;
+  const out = document.getElementById('convResult');
+  if (isNaN(val)) { out.textContent = ''; return; }
+  const [from, to] = pair.split('|');
+  const map = {
+    'm|km': v => v/1000, 'km|m': v => v*1000, 'm|cm': v => v*100, 'cm|m': v => v/100,
+    'm|mm': v => v*1000, 'kg|g': v => v*1000, 'g|kg': v => v/1000, 't|kg': v => v*1000,
+    'c|f': v => v*9/5 + 32, 'f|c': v => (v-32)*5/9, 'c|k': v => v + 273.15,
+    'h|min': v => v*60, 'min|s': v => v*60, 'h|s': v => v*3600, 'd|h': v => v*24
+  };
+  const fn = map[from + '|' + to];
+  if (!fn) { out.textContent = 'Не удалось'; return; }
+  const r = fn(val);
+  out.textContent = val + ' → ' + r.toFixed(4).replace(/\.?0+$/, '') + ' ' + to.toUpperCase();
+}
+document.getElementById('convInput').addEventListener('input', updateConv);
+document.getElementById('convFrom').addEventListener('change', updateConv);
+updateConv();
+
+// ============ СЧЁТЧИК ============
+document.getElementById('wordArea').addEventListener('input', function() {
+  const text = this.value;
+  const words = text.trim() ? text.trim().split(/\s+/).length : 0;
+  document.getElementById('wWords').textContent = words;
+  document.getElementById('wChars').textContent = text.length;
+  document.getElementById('wNoSpace').textContent = text.replace(/\s/g, '').length;
+  document.getElementById('wSent').textContent = text.split(/[.!?]+/).filter(s => s.trim()).length;
+});
+
+// ============ ШПАРГАЛКИ ============
+const cheats = {
+  'Математика': {
+    '5': [{ h: 'Действия', l: ['a + b = b + a','a · b = b · a','(a+b)+c = a+(b+c)'] }, { h: 'Проценты', l: ['1% = 0.01','a% от b = a·b/100','100% — всё'] }],
+    '8': [{ h: 'Корни', l: ['√(ab) = √a·√b','(√a)² = a'] }, { h: 'Квадратные', l: ['D = b² − 4ac','x = (−b ± √D)/2a','Виета: x₁+x₂ = −b/a'] }],
+    '10': [{ h: 'Тригонометрия', l: ['sin²α + cos²α = 1','sin(α+β) = sinα·cosβ + cosα·sinβ'] }, { h: 'Производные', l: ['(xⁿ)\' = n·xⁿ⁻¹','(sin x)\' = cos x'] }]
+  },
+  'Геометрия': {
+    '7': [{ h: 'Углы', l: ['Сумма углов треуг. = 180°','Смежные = 180°','Вертикальные равны'] }],
+    '8': [{ h: 'Площади', l: ['S прямоуг. = ab','S треуг. = ½ah','S круга = πR²'] }, { h: 'Пифагор', l: ['a² + b² = c²','3-4-5, 5-12-13'] }]
+  },
+  'Физика': {
+    '7': [{ h: 'Движение', l: ['v = S / t','F = mg','p = F / S'] }],
+    '8': [{ h: 'Тепловые', l: ['Q = cmΔt'] }, { h: 'Электричество', l: ['I = U / R','P = UI'] }]
+  },
+  'Химия': {
+    '8': [{ h: 'Основные', l: ['n = m / M','N = n · Nₐ','V = n · 22.4 л'] }],
+    '10': [{ h: 'Органика', l: ['Алканы CₙH₂ₙ₊₂','Алкены CₙH₂ₙ'] }]
+  },
+  'Информатика': {
+    '8': [{ h: 'Единицы', l: ['1 байт = 8 бит','1 Кб = 1024 байт','1 Мб = 1024 Кб'] }, { h: 'Системы', l: ['10₁₀ = 1010₂','255 = FF₁₆'] }]
+  },
+  'Русский язык': {
+    '5': [{ h: 'Части речи', l: ['Сущ.: кто? что?','Прил.: какой?','Глагол: что делать?'] }]
+  },
+  'История': {
+    '6': [{ h: 'Даты Руси', l: ['862 — Рюрик','882 — Олег','988 — Крещение','1380 — Куликовская'] }]
+  },
+  'Обществознание': {
+    '11': [{ h: 'Формы', l: ['Монархия — по наследству','Республика — выборы'] }]
+  }
+};
+
+let cheatSubject = null, cheatGrade = '5';
+
+function renderCheatSubjects() {
+  const wrap = document.getElementById('cheatSubjects');
+  wrap.innerHTML = Object.keys(cheats).map(s => `<button class="grade-btn" onclick="setCheatSubject('${s}', this)">${s}</button>`).join('');
+  wrap.firstChild.classList.add('active');
+  setCheatSubject(Object.keys(cheats)[0], wrap.firstChild);
+}
+
+function setCheatSubject(s, btn) {
+  cheatSubject = s;
+  document.querySelectorAll('#cheatSubjects .grade-btn').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  renderCheatGrades();
+}
+
+function renderCheatGrades() {
+  const wrap = document.getElementById('cheatGrades');
+  const grades = Object.keys(cheats[cheatSubject]);
+  wrap.innerHTML = grades.map(g => `<button class="btn-sm" onclick="setCheatGrade('${g}', this)">${g} класс</button>`).join('');
+  if (grades.length) { wrap.firstChild.classList.add('active'); setCheatGrade(grades[0], wrap.firstChild); }
+}
+
+function setCheatGrade(g, btn) {
+  cheatGrade = g;
+  document.querySelectorAll('#cheatGrades .btn-sm').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  renderCheats();
+}
+
+function renderCheats() {
+  const grid = document.getElementById('cheatGrid');
+  const items = cheats[cheatSubject][cheatGrade] || [];
+  grid.innerHTML = items.map(c => `<div class="cheat"><h4>${c.h}</h4><ul>${c.l.map(x => '<li>' + x + '</li>').join('')}</ul></div>`).join('');
+}
+renderCheatSubjects();
+
+// ============ ТАЙМЕР ============
+let timerLeft = 25*60, timerRunning = false, timerInt = null;
+function fmt(s) { const m = Math.floor(s/60).toString().padStart(2,'0'); const ss = (s%60).toString().padStart(2,'0'); return m + ':' + ss; }
+function setTimer(min) { if (timerRunning) return; timerLeft = min*60; document.getElementById('timerDisplay').textContent = fmt(timerLeft); beep(700, 0.05); }
+function toggleTimer() {
+  const btn = document.getElementById('timerBtn');
+  const disp = document.getElementById('timerDisplay');
+  if (!timerRunning) {
+    timerRunning = true; btn.textContent = 'Пауза';
+    timerInt = setInterval(() => {
+      timerLeft--; disp.textContent = fmt(timerLeft);
+      if (timerLeft <= 0) { clearInterval(timerInt); timerRunning = false; btn.textContent = 'Старт'; disp.textContent = 'Готово!'; timerLeft = 25*60; beep(1000, 0.4); }
+    }, 1000);
+    beep(600, 0.1);
+  } else { clearInterval(timerInt); timerRunning = false; btn.textContent = 'Старт'; beep(400, 0.1); }
+}
+function resetTimer() { clearInterval(timerInt); timerRunning = false; timerLeft = 25*60; document.getElementById('timerDisplay').textContent = fmt(timerLeft); document.getElementById('timerBtn').textContent = 'Старт'; }
+
+// ============ ЗАМЕТКИ ============
+const notesArea = document.getElementById('notesArea');
+const notesStatus = document.getElementById('notesStatus');
+notesArea.value = localStorage.getItem('alisa_notes') || '';
+notesArea.addEventListener('input', () => {
+  localStorage.setItem('alisa_notes', notesArea.value);
+  notesStatus.textContent = 'Сохранено ✓';
+  clearTimeout(notesArea._t);
+  notesArea._t = setTimeout(() => notesStatus.textContent = '', 1200);
+});
+function exportNotes() { const blob = new Blob([notesArea.value], { type: 'text/plain;charset=utf-8' }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = 'alisa-notes.txt'; a.click(); URL.revokeObjectURL(url); }
+function clearNotes() { if (!confirm('Очистить?')) return; notesArea.value = ''; localStorage.removeItem('alisa_notes'); notesStatus.textContent = 'Очищено'; setTimeout(() => notesStatus.textContent = '', 1200); }
+
+// ============ МАКСИК: AI-ассистент ============
+let maxikOpen = false, maxikGreeted = false;
+
+const MAXIK_MINI_SVG = '<svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="10" cy="30" r="7" fill="#22d3ee"/><circle cx="54" cy="30" r="7" fill="#ff5fa2"/><rect x="8" y="22" width="48" height="9" rx="4.5" fill="#22d3ee" opacity=".85"/><line x1="32" y1="6" x2="32" y2="16" stroke="#8b5cf6" stroke-width="3" stroke-linecap="round"/><circle cx="32" cy="5" r="3.6" fill="#22d3ee"/><rect x="15" y="15" width="34" height="36" rx="13" fill="#8b5cf6"/><circle cx="24" cy="30" r="4" fill="#fff"/><circle cx="40" cy="30" r="4" fill="#fff"/><circle cx="24" cy="30" r="1.9" fill="#13132b"/><circle cx="40" cy="30" r="1.9" fill="#13132b"/><path d="M26 41 Q32 45.5 38 41" stroke="#fff" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg>';
+
+function escapeHtml(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+
+function toggleMaxik() {
+  maxikOpen = !maxikOpen;
+  const panel = document.getElementById('maxikPanel');
+  const btn = document.getElementById('maxikBtn');
+  panel.classList.toggle('open', maxikOpen);
+  btn.classList.toggle('active', maxikOpen);
+  if (maxikOpen) {
+    const badge = document.getElementById('maxikBadge');
+    if (badge) badge.classList.add('hide');
+    setTimeout(() => { const i = document.getElementById('maxikInput'); if (i) i.focus(); }, 350);
+    if (!maxikGreeted) {
+      maxikGreeted = true;
+      setTimeout(() => maxikBot('Привет! 👋 Я твой личный помощник <b>Максик</b>. Помогу тебе с уроками — если что-то непонятно, задавай вопросы!'), 450);
+    }
+  }
+  beep(650, 0.05);
+}
+
+function maxikBot(html) {
+  const area = document.getElementById('maxikMsgs');
+  const div = document.createElement('div');
+  div.className = 'maxik-msg maxik-bot';
+  div.innerHTML = '<div class="maxik-bbot-av">' + MAXIK_MINI_SVG + '</div><div class="maxik-bubble">' + html + '</div>';
+  area.appendChild(div);
+  area.scrollTop = area.scrollHeight;
+  beep(750, 0.06);
+}
+
+function maxikUser(text) {
+  const area = document.getElementById('maxikMsgs');
+  const div = document.createElement('div');
+  div.className = 'maxik-msg maxik-user';
+  div.innerHTML = '<div class="maxik-bubble">' + escapeHtml(text) + '</div>';
+  area.appendChild(div);
+  area.scrollTop = area.scrollHeight;
+}
+
+function maxikTyping(on) {
+  const area = document.getElementById('maxikMsgs');
+  const old = document.getElementById('maxikTyping');
+  if (old) old.remove();
+  if (on) {
+    const div = document.createElement('div');
+    div.className = 'maxik-msg maxik-bot';
+    div.id = 'maxikTyping';
+    div.innerHTML = '<div class="maxik-bbot-av">' + MAXIK_MINI_SVG + '</div><div class="maxik-bubble"><span class="maxik-dot"></span><span class="maxik-dot"></span><span class="maxik-dot"></span></div>';
+    area.appendChild(div);
+  }
+  area.scrollTop = area.scrollHeight;
+}
+
+function maxikQuick(q) {
+  document.getElementById('maxikInput').value = q;
+  maxikSend();
+}
+
+function maxikSend() {
+  const input = document.getElementById('maxikInput');
+  const q = input.value.trim();
+  if (!q) return;
+  input.value = '';
+  maxikUser(q);
+  maxikTyping(true);
+  const grade = (typeof currentGrade !== 'undefined') ? currentGrade : '5';
+  const subject = (typeof currentSubject !== 'undefined' && currentSubject) ? currentSubject : '';
+  aiFetch('/api/ask', { grade, subject, question: q })
+    .then(d => { maxikTyping(false); maxikBot(d.answer || 'Хм, не нашёл ответа. Попробуй сформулировать иначе.'); })
+    .catch(err => { maxikTyping(false); maxikBot('⚠️ ' + err.message); });
+}
+
+// ============ ИНСТРУМЕНТЫ ============
+function openTool(name, btn) {
+  document.querySelectorAll('.tool-panel').forEach(t => t.classList.remove('active'));
+  const target = document.getElementById('tool-' + name);
+  if (target) target.classList.add('active');
+  if (btn) { document.querySelectorAll('#tools .grade-btn').forEach(b => b.classList.remove('active')); btn.classList.add('active'); }
+}
+</script>
+
+<!-- ===== Максик: AI-ассистент ===== -->
+<button class="maxik-btn" id="maxikBtn" onclick="toggleMaxik()" title="Максик — AI-помощник">
+  <svg class="maxik-robot" viewBox="0 0 64 64" aria-hidden="true">
+    <defs>
+      <linearGradient id="mkB1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#22d3ee"/><stop offset="1" stop-color="#ff5fa2"/></linearGradient>
+      <linearGradient id="mkB2" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ff5fa2"/><stop offset=".5" stop-color="#8b5cf6"/><stop offset="1" stop-color="#22d3ee"/></linearGradient>
+    </defs>
+    <circle cx="10" cy="30" r="7" fill="url(#mkB1)"/>
+    <circle cx="54" cy="30" r="7" fill="url(#mkB1)"/>
+    <rect x="8" y="22" width="48" height="9" rx="4.5" fill="url(#mkB1)" opacity=".85"/>
+    <line x1="32" y1="6" x2="32" y2="16" stroke="#8b5cf6" stroke-width="3" stroke-linecap="round"/>
+    <circle cx="32" cy="5" r="3.6" fill="#22d3ee"/>
+    <rect x="15" y="15" width="34" height="36" rx="13" fill="url(#mkB2)"/>
+    <circle cx="24" cy="30" r="4" fill="#fff"/>
+    <circle cx="40" cy="30" r="4" fill="#fff"/>
+    <circle cx="24" cy="30" r="1.9" fill="#13132b"/>
+    <circle cx="40" cy="30" r="1.9" fill="#13132b"/>
+    <path d="M26 41 Q32 45.5 38 41" stroke="#fff" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+    <circle cx="17.5" cy="37" r="2.3" fill="#fff" opacity=".45"/>
+    <circle cx="46.5" cy="37" r="2.3" fill="#fff" opacity=".45"/>
+    <circle cx="10" cy="30" r="2.1" fill="#fff" opacity=".85"/>
+    <circle cx="54" cy="30" r="2.1" fill="#fff" opacity=".85"/>
+  </svg>
+  <span class="maxik-badge" id="maxikBadge">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="13" rx="4" fill="#fff"/><path d="M7 19l3-2h4l3 2V17H7z" fill="#fff"/><circle cx="8.2" cy="10.5" r="1.4" fill="#ff2d87"/><circle cx="12" cy="10.5" r="1.4" fill="#ff2d87"/><circle cx="15.8" cy="10.5" r="1.4" fill="#ff2d87"/></svg>
+  </span>
+</button>
+<div class="maxik-panel" id="maxikPanel">
+  <div class="maxik-head">
+    <div class="maxik-av">
+      <svg class="maxik-robot" viewBox="0 0 64 64" aria-hidden="true">
+        <defs>
+          <linearGradient id="mkH1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#22d3ee"/><stop offset="1" stop-color="#ff5fa2"/></linearGradient>
+          <linearGradient id="mkH2" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ff5fa2"/><stop offset=".5" stop-color="#8b5cf6"/><stop offset="1" stop-color="#22d3ee"/></linearGradient>
+        </defs>
+        <circle cx="10" cy="30" r="7" fill="url(#mkH1)"/>
+        <circle cx="54" cy="30" r="7" fill="url(#mkH1)"/>
+        <rect x="8" y="22" width="48" height="9" rx="4.5" fill="url(#mkH1)" opacity=".85"/>
+        <line x1="32" y1="6" x2="32" y2="16" stroke="#8b5cf6" stroke-width="3" stroke-linecap="round"/>
+        <circle cx="32" cy="5" r="3.6" fill="#22d3ee"/>
+        <rect x="15" y="15" width="34" height="36" rx="13" fill="url(#mkH2)"/>
+        <circle cx="24" cy="30" r="4" fill="#fff"/>
+        <circle cx="40" cy="30" r="4" fill="#fff"/>
+        <circle cx="24" cy="30" r="1.9" fill="#13132b"/>
+        <circle cx="40" cy="30" r="1.9" fill="#13132b"/>
+        <path d="M26 41 Q32 45.5 38 41" stroke="#fff" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+        <circle cx="17.5" cy="37" r="2.3" fill="#fff" opacity=".45"/>
+        <circle cx="46.5" cy="37" r="2.3" fill="#fff" opacity=".45"/>
+        <circle cx="10" cy="30" r="2.1" fill="#fff" opacity=".85"/>
+        <circle cx="54" cy="30" r="2.1" fill="#fff" opacity=".85"/>
+      </svg>
+    </div>
+    <div>
+      <div class="maxik-name">Максик</div>
+      <div class="maxik-status">онлайн · Gemini AI</div>
+    </div>
+    <button class="maxik-close" onclick="toggleMaxik()" title="Закрыть">✕</button>
+  </div>
+  <div class="maxik-msgs" id="maxikMsgs"></div>
+  <div class="maxik-chips">
+    <button class="maxik-chip" onclick="maxikQuick('Что такое дробь?')">Что такое дробь?</button>
+    <button class="maxik-chip" onclick="maxikQuick('Объясни тему проще')">Объясни проще</button>
+    <button class="maxik-chip" onclick="maxikQuick('Помоги решить задачу')">Помоги решить</button>
+  </div>
+  <div class="maxik-input-row">
+    <input class="maxik-input" id="maxikInput" placeholder="Напиши вопрос Максику..." onkeydown="if(event.key==='Enter')maxikSend()">
+    <button class="maxik-send" onclick="maxikSend()">➤</button>
+  </div>
+</div>
+
+</body>
+</html>
