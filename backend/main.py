@@ -12,6 +12,7 @@ from gemini_client import ask_question, explain_topic, generate_task
 BASE_DIR = Path(__file__).resolve().parent
 SITE_DIR = (BASE_DIR / "..").resolve()
 HTML_FILE = SITE_DIR / "js" / "Алиса School .html"
+GAME_FILE = SITE_DIR / "js" / "tank-game.html"
 
 load_dotenv(BASE_DIR / ".env")
 
@@ -53,6 +54,11 @@ class TaskRequest(BaseModel):
 @app.get("/")
 async def serve_site():
     return FileResponse(str(HTML_FILE), media_type="text/html")
+
+
+@app.get("/game")
+async def serve_game():
+    return FileResponse(str(GAME_FILE), media_type="text/html")
 
 
 @app.get("/api/health")
